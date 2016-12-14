@@ -47,7 +47,8 @@ function runTest (test) {
   return runStep(test.children, 0)(null)
 }
 
-const testModule = require(require('fs').realpathSync(args._[0]))
+const testModulePath = require('fs').realpathSync(args._[0])
+const testModule = require(testModulePath)
 
 console.log(chalk.bold.magenta('# prescript'), 'v' + require('./package').version)
 console.log()
@@ -56,9 +57,15 @@ const test = loadTestModule(testModule)
 console.log(chalk.dim('* ') + chalk.green('Test plan generated successfully.'))
 console.log()
 
-const dryRun = args.d || args['dry-run']
+const dev = args.d || args['dev']
 
-if (!dryRun) {
+if (dev) {
+  const vorpal = require('vorpal')()
+  vorpal.command('run').action(function (args, callback) {
+    runTest(test).then(() => callback(), (err) => callback(err))
+  })
+  vorpal.delimiter('prescript>').show()
+} else {
   console.log(chalk.bold.yellow('## Running tests...'))
   runTest(test).catch((e) => setTimeout(() => { throw e }))
 }
