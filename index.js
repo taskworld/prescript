@@ -32,6 +32,7 @@ function runTest (test) {
 function runDevelopmentMode () {
   const state = { }
   const tester = createTestIterator()
+  let previousResult
 
   function loadTest () {
     clearModuleCache()
@@ -85,8 +86,14 @@ function runDevelopmentMode () {
     const currentStepNumber = tester.getCurrentStepNumber()
     walkSteps(tester.getTest(), (step) => {
       const prefix = (step.number === currentStepNumber
-        ? chalk.bold.yellow('<*>')
-        : '   '
+        ? chalk.bold.blue('<*>')
+        : (previousResult && step.number === previousResult.stepNumber
+          ? (previousResult.error
+            ? chalk.bold.red('<*>')
+            : chalk.bold.green('<*>')
+          )
+          : '   '
+        )
       )
       console.log(prefix, prettyFormatStep(step))
     })
@@ -118,11 +125,7 @@ function runDevelopmentMode () {
   .action(function (args, callback) {
     co(function * () {
       while (!tester.isDone()) {
-        let error
-        yield * runNext(tester, state, (e) => { error = e })
-        if (error) {
-          break
-        }
+        if (yield * nextStep()) break
       }
     }).then(() => callback(), (err) => callback(err))
   })
@@ -132,11 +135,19 @@ function runDevelopmentMode () {
   .description('Run the next step.')
   .action(function (args, callback) {
     co(function * () {
-      yield * runNext(tester, state, () => { })
+      yield * nextStep()
     }).then(() => callback(), (err) => callback(err))
   })
 
   vorpal.delimiter('prescript>').show()
+
+  function * nextStep () {
+    let error
+    const stepNumber = tester.getCurrentStepNumber()
+    yield * runNext(tester, state, (e) => { error = e })
+    previousResult = { stepNumber, error }
+    return error
+  }
 }
 
 function * runNext (tester, state, onError) {
