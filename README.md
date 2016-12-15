@@ -1,5 +1,5 @@
 
-# prescript - an acceptance test runner
+# prescript - an acceptance test runner [![CircleCI](https://circleci.com/gh/taskworld/prescript/tree/master.svg?style=svg)](https://circleci.com/gh/taskworld/prescript/tree/master)
 
 `prescript` is a library for creating acceptance tests.
 
