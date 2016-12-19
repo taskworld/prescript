@@ -22,5 +22,8 @@
   "scripts": {
     "test": "jest",
     "test-examples": "node examples/testAll.js"
+  },
+  "bin": {
+    "prescript": "./bin/prescript"
   }
 }
