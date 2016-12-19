@@ -15,6 +15,7 @@
     "vorpal": "^1.11.4"
   },
   "devDependencies": {
+    "glob": "^7.1.1",
     "jest": "^17.0.3",
     "standard": "^8.6.0"
   },
