@@ -1,7 +1,7 @@
 
 # prescript - an acceptance test runner [![CircleCI](https://circleci.com/gh/taskworld/prescript/tree/master.svg?style=svg)](https://circleci.com/gh/taskworld/prescript/tree/master)
 
-__prescript__ is a JavaScript test framework that helps make it fun to write end-to-end/acceptance tests.
+__prescript__ is a JavaScript test micro-framework that helps make it fun to write end-to-end/acceptance tests.
 
 > __Note:__ It is quite hard to explain in writing. I recommend watching this very short video demo instead. But I haven’t produced the video yet :(. Check back later then :)
 
@@ -27,7 +27,22 @@ Step 9. I should be in the workspace
 prescript comes with an __interactive development mode,__ in which you can __hot-reload the test script__ and __jump between steps.__ This means as you write your test, if you make a mistake you can fix it without having to re-run the whole test suite.
 
 
-## How to write tests
+## Running tests
+
+To run in development mode:
+
+```
+./node_modules/.bin/prescript tests/Filename.js -d
+```
+
+To run in non-interactive mode:
+
+```
+./node_modules/.bin/prescript tests/Filename.js
+```
+
+
+## Writing tests
 
 Import `prescript` to access its APIs.
 
@@ -100,6 +115,8 @@ Upgrading to this pattern is very beneficial when there are many test cases that
 const CalculatorTester = require('../test-lib/CalculatorTester')
 CalculatorTester().add(50, 70).resultMustBe(120)
 ```
+
+Now our test is a single line!
 
 ```js
 // CalculatorTester.js
