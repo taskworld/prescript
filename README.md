@@ -3,6 +3,8 @@
 
 __prescript__ is a JavaScript test framework that helps make it fun to write end-to-end/acceptance tests.
 
+> __Note:__ It is quite hard to explain in writing. I recommend watching this very short video demo instead. But I haven’t produced the video yet :(. Check back later then :)
+
 Writing end-to-end tests (e.g. using Selenium) with unit-testing frameworks such as Mocha can sometimes be painful, because when some command fails to run, you need to re-run the test from the beginning to verify that you fixed it. End-to-end tests is usually very slow compared to unit tests.
 
 prescript solves this problem by allowing you to express your tests as multiple, discrete steps.
@@ -182,4 +184,3 @@ onFinish(() => {
   })
 })
 ```
-
