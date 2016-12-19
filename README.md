@@ -177,9 +177,15 @@ Defines a cleanup step. It’s different from normal steps:
 they are always run even if previous steps failed.
 
 
-### `action(async (state) => { ... })`
+### `action(async (state, context) => { ... })`
 
-Defines the step’s ‘runtime action.’
+Defines the step’s ‘runtime action.’ The function passed to `action()` will be called with these arguments:
+
+- __state__ - The state object. In the beginning of the test, it is empty. Add things to this object to persist state between steps and reloads.
+
+- __context__ - The context object contains:
+
+    - `log(...)` - Logs a message to the console. Use this instead of `console.log()` so that it doesn’t mess up console output.
 
 
 ### `onFinish(() => { ... })`
