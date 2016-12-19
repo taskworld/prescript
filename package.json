@@ -20,6 +20,7 @@
     "standard": "^8.6.0"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-examples": "node examples/testAll.js"
   }
 }
