@@ -1,4 +1,5 @@
 #!/usr/bin/env node
 
 const cli = require('../lib/cli')
-cli(require('minimist')(process.argv.slice(2)))
+const options = { boolean: [ 'd' ] }
+cli(require('minimist')(process.argv.slice(2), options))
