@@ -27,21 +27,6 @@ Step 9. I should be in the workspace
 prescript comes with an __interactive development mode,__ in which you can __hot-reload the test script__ and __jump between steps.__ This means as you write your test, if you make a mistake you can fix it without having to re-run the whole test suite.
 
 
-## Running tests
-
-To run in development mode:
-
-```
-./node_modules/.bin/prescript tests/Filename.js -d
-```
-
-To run in non-interactive mode:
-
-```
-./node_modules/.bin/prescript tests/Filename.js
-```
-
-
 ## Writing tests
 
 Import `prescript` to access its APIs.
@@ -118,6 +103,8 @@ CalculatorTester().add(50, 70).resultMustBe(120)
 
 Now our test is a single line!
 
+All the heavy lifting is in the CalculatorTester class:
+
 ```js
 // CalculatorTester.js
 const { step, action } = require('../../..')
@@ -156,6 +143,46 @@ module.exports = function CalculatorTester () {
   return calculatorTester
 }
 ```
+
+
+## Running a test
+
+To run a test in development mode:
+
+```
+./node_modules/.bin/prescript tests/Filename.js -d
+```
+
+To run a test in non-interactive mode:
+
+```
+./node_modules/.bin/prescript tests/Filename.js
+```
+
+### Exit code
+
+_(Only applies to non-interactive mode)_
+
+| Exit Code | Description |
+| --------- | ----------- |
+| 0         | Successful test |
+| 1         | Failed test |
+| 2         | Pending test |
+
+
+### Running multiple tests
+
+prescript __by design__ only runs a single test.
+This allows prescript to remain a simple tool.
+Then you can implement your own test orchestrator to fit your project needs:
+
+- Run only a subset of tests.
+- Run tests in parallel.
+- Randomize or specify the order of tests.
+- Retry failed tests.
+- Prepare environment variables before running tests.
+
+If prescript supported all of the above, it would make this micro-framework unnecessarily complex. Therefore, prescript encourages you to write your own test orchestrator. [It’s just a few lines of code!](./examples/testAll.js)
 
 
 ## API
