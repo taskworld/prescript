@@ -207,3 +207,8 @@ onFinish(() => {
   })
 })
 ```
+
+
+### `pending()`
+
+Defines a pending step.
