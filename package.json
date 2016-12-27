@@ -1,6 +1,6 @@
 {
   "name": "prescript",
-  "version": "0.24.1",
+  "version": "0.120.1",
   "description": "Object-oriented acceptance test tool",
   "main": "index.js",
   "author": "Thai Pangsakulyanont <thai.p@taskworld.com>",
