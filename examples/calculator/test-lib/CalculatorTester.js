@@ -1,4 +1,4 @@
-const { step, action } = require('../../..')
+const { step, action, titled } = require('../../..')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
@@ -8,7 +8,7 @@ module.exports = function CalculatorTester () {
   })
   const calculatorTester = {
     add (a, b) {
-      step(`Calculate ${a} + ${b}`, () => {
+      step(titled `Calculate ${a} + ${b}`, () => {
         enter(a)
         enter(b)
         pressAdd()
@@ -16,13 +16,13 @@ module.exports = function CalculatorTester () {
       return calculatorTester
     },
     resultMustBe (n) {
-      step(`Stored result must be ${n}`, () => {
+      step(titled `Stored result must be ${n}`, () => {
         action((state) => { assert.equal(state.calculator.result, n) })
       })
     }
   }
   function enter (number) {
-    step(`Enter ${number} into the calculator`, () => {
+    step(titled `Enter ${number} into the calculator`, () => {
       action((state) => { state.calculator.enter(number) })
     })
   }
