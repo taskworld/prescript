@@ -17,5 +17,5 @@ for (const file of glob.sync('examples/*/tests/**/*.js')) {
 }
 
 if (failures) {
-  process.exit(1)
+  process.exitCode = 1
 }
