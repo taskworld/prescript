@@ -11,7 +11,8 @@ dependencies:
 test:
   override:
     - yarn test
-    - yarn run test-examples
+    - ALLURE_SUITE_NAME=prescript-examples yarn run test-examples
+    - npm install -g allure-commandline && allure generate allure-results -o "$CIRCLE_ARTIFACTS/allure-report"
 deployment:
   npm:
     tag: /v[0-9]+(\.[0-9]+)*/
