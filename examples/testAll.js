@@ -10,9 +10,13 @@ for (const file of glob.sync('examples/*/tests/**/*.js')) {
     require('child_process').execFileSync('./bin/prescript', [ file ])
     console.log(chalk.bgGreen.bold(' OK '), file)
   } catch (e) {
-    console.log(chalk.bgRed.bold(' NG '), file)
-    console.log(e.output.join(''))
-    failures += 1
+    if (e.status === 2) {
+      console.log(chalk.bgCyan.bold(' .. '), file)
+    } else {
+      console.log(chalk.bgRed.bold(' NG '), file)
+      console.log(e.output.join(''))
+      failures += 1
+    }
   }
 }
 
