@@ -1,14 +1,14 @@
-const { step, action, named } = require('../../..')
+const { to, action, named } = require('../../..')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
 module.exports = function CalculatorTester () {
-  step('Initialize the calculator', () => {
-    action((state) => { state.calculator = new Calculator() })
+  action('Initialize the calculator', (state) => {
+    state.calculator = new Calculator()
   })
   const calculatorTester = {
     add (a, b) {
-      step(named `Calculate ${a} + ${b}`, () => {
+      to(named `Calculate ${a} + ${b}`, () => {
         enter(a)
         enter(b)
         pressAdd()
@@ -16,19 +16,19 @@ module.exports = function CalculatorTester () {
       return calculatorTester
     },
     resultMustBe (n) {
-      step(named `Stored result must be ${n}`, () => {
-        action((state) => { assert.equal(state.calculator.result, n) })
+      action(named `Stored result must be ${n}`, (state) => {
+        assert.equal(state.calculator.result, n)
       })
     }
   }
   function enter (number) {
-    step(named `Enter ${number} into the calculator`, () => {
-      action((state) => { state.calculator.enter(number) })
+    action(named `Enter ${number} into the calculator`, (state) => {
+      state.calculator.enter(number)
     })
   }
   function pressAdd () {
-    step('Press add', () => {
-      action((state) => { state.calculator.add() })
+    action('Press add', (state) => {
+      state.calculator.add()
     })
   }
   return calculatorTester

@@ -32,61 +32,65 @@ prescript comes with an __interactive development mode,__ in which you can __hot
 Import `prescript` to access its APIs.
 
 ```js
-const { step, action } = require('prescript')
+const { test, to, action, defer, pending } = require('prescript')
 ```
 
 
-### Use `step()` to define a step
+### A basic test.
 
-Each step should contain a single `action()`, which defines what to do when this step is run.
+Use `test()` to define a test. Each test must have a unique name.
 
-When using `action()`, you should pass a function that returns a Promise (async action) or returns nothing (sync action).
+Inside each test, use `action()` to queue an action to be run at runtime.
 
 ```js
 // Basic addition.js
-const { step, action } = require('prescript')
+const { test, to, action } = require('prescript')
 const assert = require('assert')
 const Calculator = require('../lib/Calculator')
 
-step('Initialize the calculator', () => {
-  action((state) => { state.calculator = new Calculator() })
-})
-step('Enter 50 into the calculator', () => {
-  action((state) => { state.calculator.enter(50) })
-})
-step('Enter 70 into the calculator', () => {
-  action((state) => { state.calculator.enter(70) })
-})
-step('Press add', () => {
-  action((state) => { state.calculator.add() })
-})
-step('Stored result must be 120', () => {
-  action((state) => { assert.equal(state.calculator.result, 120) })
+test('Basic addition', () => {
+  action('Initialize the calculator', (state) => {
+    state.calculator = new Calculator()
+  })
+  action('Enter 50 into the calculator', (state) => {
+    state.calculator.enter(50)
+  })
+  action('Enter 70 into the calculator', (state) => {
+    state.calculator.enter(70)
+  })
+  action('Press add', (state) => {
+    state.calculator.add()
+  })
+  action('Stored result must be 120', (state) => {
+    assert.equal(state.calculator.result, 120)
+  })
 })
 ```
 
 
 ### Nest steps to group related steps together
 
-Steps may be nested:
+Multiple actions may be grouped using `to()`.
 
 ```js
-step('Initialize the calculator', () => {
-  action((state) => { state.calculator = new Calculator() })
-})
-step('Calculate 50 + 70', () => {
-  step('Enter 50 into the calculator', () => {
-    action((state) => { state.calculator.enter(50) })
+test('Basic addition', () => {
+  action('Initialize the calculator', (state) => {
+    state.calculator = new Calculator()
   })
-  step('Enter 70 into the calculator', () => {
-    action((state) => { state.calculator.enter(70) })
+  to('Calculate 50 + 70', () => {
+    action('Enter 50 into the calculator', (state) => {
+      state.calculator.enter(50)
+    })
+    action('Enter 70 into the calculator', (state) => {
+      state.calculator.enter(70)
+    })
+    action('Press add', (state) => {
+      state.calculator.add()
+    })
   })
-  step('Press add', () => {
-    action((state) => { state.calculator.add() })
+  action('Stored result must be 120', (state) => {
+    assert.equal(state.calculator.result, 120)
   })
-})
-step('Stored result must be 120', () => {
-  action((state) => { assert.equal(state.calculator.result, 120) })
 })
 ```
 
@@ -97,8 +101,12 @@ Upgrading to this pattern is very beneficial when there are many test cases that
 
 ```js
 // Basic addition.js
+const { test } = require('prescript')
 const CalculatorTester = require('../test-lib/CalculatorTester')
-CalculatorTester().add(50, 70).resultMustBe(120)
+
+test('Basic addition', () => {
+  CalculatorTester().add(50, 70).resultMustBe(120)
+})
 ```
 
 Now our test is a single line!
@@ -107,17 +115,17 @@ All the heavy lifting is in the CalculatorTester class:
 
 ```js
 // CalculatorTester.js
-const { step, action } = require('../../..')
+const { to, action } = require('../../..')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
 module.exports = function CalculatorTester () {
-  step('Initialize the calculator', () => {
-    action((state) => { state.calculator = new Calculator() })
+  action('Initialize the calculator', (state) => {
+    state.calculator = new Calculator()
   })
   const calculatorTester = {
     add (a, b) {
-      step(`Calculate ${a} + ${b}`, () => {
+      to(`Calculate ${a} + ${b}`, () => {
         enter(a)
         enter(b)
         pressAdd()
@@ -125,19 +133,19 @@ module.exports = function CalculatorTester () {
       return calculatorTester
     },
     resultMustBe (n) {
-      step(`Stored result must be ${n}`, () => {
-        action((state) => { assert.equal(state.calculator.result, n) })
+      action(`Stored result must be ${n}`, (state) => {
+        assert.equal(state.calculator.result, n)
       })
     }
   }
   function enter (number) {
-    step(`Enter ${number} into the calculator`, () => {
-      action((state) => { state.calculator.enter(number) })
+    action(`Enter ${number} into the calculator`, (state) => {
+      state.calculator.enter(number)
     })
   }
   function pressAdd () {
-    step('Press add', () => {
-      action((state) => { state.calculator.add() })
+    action('Press add', (state) => {
+      state.calculator.add()
     })
   }
   return calculatorTester
@@ -187,26 +195,14 @@ If prescript supported all of the above, it would make this micro-framework unne
 
 ## API
 
-### `step(name, () => { ... })`
+### `to(name, () => { ... })`
 
-Defines a step. May be nested.
-
-A step may either contain
-
-- a single action block
-
-- nested steps
+Defines a composite step.
 
 
-### `cleanup(name, () => { ... })`
+### `action(name, async (state, context) => { ... })`
 
-Defines a cleanup step. It’s different from normal steps:
-they are always run even if previous steps failed.
-
-
-### `action(async (state, context) => { ... })`
-
-Defines the step’s ‘runtime action.’ The function passed to `action()` will be called with these arguments:
+Queue an action to be run. The function passed to `action()` will be called with these arguments:
 
 - __state__ - The state object. In the beginning of the test, it is empty. Add things to this object to persist state between steps and reloads.
 
@@ -215,23 +211,20 @@ Defines the step’s ‘runtime action.’ The function passed to `action()` wil
     - `log(...)` - Logs a message to the console. Use this instead of `console.log()` so that it doesn’t mess up console output.
 
 
-### `onFinish(() => { ... })`
+### `defer(name, async (state, context) => { ... })`
 
-Defines code to run once the whole test finished loading. Can be used in conjunction with `cleanup()`:
+Queues a deferred action to be run at the end of test.
+Note: The deferred action will be run only if all previous actions are run successfully.
 
 ```js
-step('Open browser', () => {
-  action(state => {
-    const options = { desiredCapabilities: { browserName: 'chrome' } }
-    const browser = webdriverio.remote(options)
-    state.browser = browser
-    return browser.init()
-  })
+action('Open browser', (state) => {
+  const options = { desiredCapabilities: { browserName: 'chrome' } }
+  const browser = webdriverio.remote(options)
+  state.browser = browser
+  return browser.init()
 })
-onFinish(() => {
-  cleanup('Quit browser', () => {
-    action((state) => state.browser.end())
-  })
+defer('Quit browser', (state) => {
+  action((state) => state.browser.end())
 })
 ```
 
