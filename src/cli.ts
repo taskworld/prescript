@@ -11,8 +11,9 @@ import isStepExist from './isStepExist'
 import createReporter from './createReporter'
 import prettyFormatStep from './prettyFormatStep'
 import createTestIterator from './createTestIterator'
-import { ITestIterator, IStep } from './types';
+import { ITestIterator, IStep, ITestLoadLogger } from './types';
 import { StepName } from './StepName';
+import { createConsoleLogger } from './loadTestModule';
 
 function main (args) {
   const testModulePath = require('fs').realpathSync(args._[0])
@@ -194,10 +195,24 @@ function runDevelopmentMode (testModulePath: string, requestedTestName: string |
   }
 }
 
+function createFilteredLogger (requestedTestName: string | null): ITestLoadLogger {
+  const logger = createConsoleLogger()
+  let active = !requestedTestName
+  return {
+    test (name) {
+      if (requestedTestName) active = String(name) === requestedTestName
+      if (active) logger.test(name)
+    },
+    step (step) {
+      if (active) logger.step(step)
+    }
+  }
+}
+
 function runNonInteractiveMode (testModulePath: string, requestedTestName: string | null) {
   console.log(chalk.bold.yellow('## Generating test plan...'))
   const tests = singleton
-    .loadTests(() => { require(testModulePath) })
+    .loadTests(() => { require(testModulePath) }, { logger: createFilteredLogger(requestedTestName) })
     .filter(filterTest(requestedTestName))
   if (!tests.length) {
     throw new Error('No tests found.')

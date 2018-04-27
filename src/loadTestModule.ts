@@ -212,7 +212,7 @@ function loadTest (
   return load()
 }
 
-function createConsoleLogger () {
+export function createConsoleLogger () {
   return {
     step (step: IStep) {
       console.log(
@@ -228,7 +228,7 @@ function createConsoleLogger () {
   }
 }
 
-function createNullLogger () {
+export function createNullLogger () {
   return {
     step (step: IStep) {
     },
