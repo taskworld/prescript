@@ -115,7 +115,7 @@ All the heavy lifting is in the CalculatorTester class:
 
 ```js
 // CalculatorTester.js
-const { to, action } = require('../../..')
+const { to, named, action } = require('../../..')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
@@ -125,7 +125,7 @@ module.exports = function CalculatorTester () {
   })
   const calculatorTester = {
     add (a, b) {
-      to(`Calculate ${a} + ${b}`, () => {
+      to(named `Calculate ${a} + ${b}`, () => {
         enter(a)
         enter(b)
         pressAdd()
@@ -133,13 +133,13 @@ module.exports = function CalculatorTester () {
       return calculatorTester
     },
     resultMustBe (n) {
-      action(`Stored result must be ${n}`, (state) => {
+      action(named `Stored result must be ${n}`, (state) => {
         assert.equal(state.calculator.result, n)
       })
     }
   }
   function enter (number) {
-    action(`Enter ${number} into the calculator`, (state) => {
+    action(named `Enter ${number} into the calculator`, (state) => {
       state.calculator.enter(number)
     })
   }
@@ -158,13 +158,20 @@ module.exports = function CalculatorTester () {
 To run a test in development mode:
 
 ```
-./node_modules/.bin/prescript tests/Filename.js -d
+./node_modules/.bin/prescript tests/Filename.js ["Test name"] -d
 ```
 
 To run a test in non-interactive mode:
 
 ```
-./node_modules/.bin/prescript tests/Filename.js
+./node_modules/.bin/prescript tests/Filename.js ["Test name"]
+```
+
+**Test name** is optional if there is only one test. If a test file declares multiple test, you must explicitly specify the test name. You can list all tests using:
+
+```
+./node_modules/.bin/prescript tests/Filename.js --list
+./node_modules/.bin/prescript tests/Filename.js --list --json
 ```
 
 ### Exit code
@@ -176,6 +183,7 @@ _(Only applies to non-interactive mode)_
 | 0         | Successful test |
 | 1         | Failed test |
 | 2         | Pending test |
+| 3         | Multiple tests defined |
 
 
 ### Running multiple tests

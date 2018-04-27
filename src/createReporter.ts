@@ -1,8 +1,8 @@
-const path = require('path')
+import path from 'path'
 
-function createReporter (testModulePath) {
+export default function createReporter (testModulePath) {
   if (!process.env.ALLURE_SUITE_NAME && !process.env.ALLURE_RESULTS_DIR && !process.env.ALLURE_CASE_NAME) {
-    return { onFinish () { }, iterationListener: { } }
+    return { onFinish (errors: Error[]) { }, iterationListener: { } }
   }
   const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
   const caseName = process.env.ALLURE_CASE_NAME || path.relative(process.cwd(), testModulePath)
@@ -22,10 +22,10 @@ function createReporter (testModulePath) {
         if (node.number) allure.endStep(error ? 'failed' : 'passed', Date.now())
       }
     },
-    onFinish (errors) {
+    onFinish (errors: Error[]) {
       if (errors.length) {
         const error = errors[0]
-        if (error.__prescriptPending) {
+        if ((error as any).__prescriptPending) {
           allure.endCase('pending')
         } else {
           allure.endCase('failed', error)
@@ -37,5 +37,3 @@ function createReporter (testModulePath) {
     }
   }
 }
-
-module.exports = createReporter

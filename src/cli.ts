@@ -1,22 +1,23 @@
-const ms = require('ms')
-const path = require('path')
-const util = require('util')
-const chalk = require('chalk')
-const indentString = require('indent-string')
+import ms from 'ms'
+import path from 'path'
+import util from 'util'
+import chalk from 'chalk'
+import indentString from 'indent-string'
 
-const createUI = require('./createUI')
-const singleton = require('./singleton')
-const walkSteps = require('./walkSteps')
-const isStepExist = require('./isStepExist')
-const createReporter = require('./createReporter')
-const prettyFormatStep = require('./prettyFormatStep')
-const createTestIterator = require('./createTestIterator')
+import createUI from './createUI'
+import * as singleton from './singleton'
+import walkSteps from './walkSteps'
+import isStepExist from './isStepExist'
+import createReporter from './createReporter'
+import prettyFormatStep from './prettyFormatStep'
+import createTestIterator from './createTestIterator'
+import { ITestIterator } from './types';
 
-function runDevelopmentMode (testModulePath) {
+function runDevelopmentMode (testModulePath: string) {
   const state = { }
-  const tester = createTestIterator(createLogVisitor())
+  const tester: ITestIterator = createTestIterator(createLogVisitor())
   const ui = createUI()
-  let previousResult
+  let previousResult: { stepNumber: string | null, error?: Error } | null = null
 
   function loadTest () {
     ui.testLoadStarted()
@@ -68,7 +69,7 @@ function runDevelopmentMode (testModulePath) {
     reload () {
       clearModuleCache()
       loadTest()
-      const reloadResult = { }
+      const reloadResult: { jump?: { target: string | null, success: boolean } } = { }
       if (previousResult) {
         const jumpTarget = previousResult.stepNumber
         tester.begin(jumpTarget)
@@ -109,7 +110,7 @@ function runDevelopmentMode (testModulePath) {
     }
   })
 
-  async function runTestWhileConditionMet (condition) {
+  async function runTestWhileConditionMet (condition?) {
     const executeCondition = () => typeof condition === 'function' ? condition() : true
     while (executeCondition() && !tester.isDone()) {
       if (await runNextStep()) break
@@ -145,7 +146,7 @@ function runNonInteractiveMode (testModulePath) {
     const state = { }
     const reporter = createReporter(testModulePath)
     const tester = createTestIterator(createLogVisitor(), reporter.iterationListener)
-    const errors = [ ]
+    const errors: Error[] = [ ]
     const started = Date.now()
     tester.setTest(test)
     tester.begin()
@@ -156,7 +157,7 @@ function runNonInteractiveMode (testModulePath) {
     const timeTaken = Date.now() - started
     const formattedTimeTaken = chalk.dim(ms(timeTaken))
     if (errors.length) {
-      if (errors.every(e => e.__prescriptPending)) {
+      if (errors.every(e => (e as any).__prescriptPending)) {
         console.log(chalk.bold.yellow('Test pending'), formattedTimeTaken)
         process.exitCode = 2
       } else {
@@ -182,9 +183,9 @@ function createLogVisitor () {
   }
 }
 
-async function runNext (tester, state, onError) {
+async function runNext (tester: ITestIterator, state, onError: (e: Error) => void) {
   const step = tester.getCurrentStep()
-  const indent = 7 + step.number.length
+  const indent = 7 + (step.number || '').length
 
   process.stdout.write(
     chalk.dim((step.defer ? 'Deferred ' : '') + 'Step ') +
@@ -193,13 +194,16 @@ async function runNext (tester, state, onError) {
   )
   const started = Date.now()
   const formatTimeTaken = () => chalk.dim(ms(Date.now() - started))
-  const log = [ ]
+  const log: string[] = [ ]
   const context = {
-    log: (...args) => {
-      log.push(util.format(...args))
+    log: (format, ...args) => {
+      log.push(util.format(format, ...args))
     }
   }
   try {
+    if (!step || !step.action) {
+      throw new Error('Internal error: No step to run.')
+    }
     const promise = step.action(state, context)
     if (
       (promise && typeof promise.then !== 'function') ||
@@ -246,4 +250,4 @@ function main (args) {
   }
 }
 
-module.exports = main
+export default main

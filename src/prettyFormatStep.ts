@@ -1,10 +1,11 @@
-const chalk = require('chalk')
-const StepName = require('./StepName')
+import chalk from 'chalk'
+import * as StepName from './StepName'
+import { IStep } from './types'
 
-function prettyFormatStep (step) {
+export default function prettyFormatStep (step: IStep) {
   let result = ''
-  const write = (stuff) => { result += stuff }
-  const numberParts = step.number.split('.')
+  const write = (stuff: string) => { result += stuff }
+  const numberParts = (step.number || '').split('.')
   const frontNumber = numberParts.slice(0, -1).join('.')
   const lastNumber = numberParts[numberParts.length - 1]
   const formattedName = StepName.format(step.name)
@@ -21,5 +22,3 @@ function prettyFormatStep (step) {
   }
   return result
 }
-
-module.exports = prettyFormatStep

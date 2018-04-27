@@ -1,6 +1,6 @@
 const { getInstance } = require('./singleton')
 
-module.exports = {
+const singletonApi = {
   /**
    * Creates a test.
    */
@@ -46,3 +46,6 @@ module.exports = {
     return getInstance().onFinish(f)
   },
 }
+
+export default singletonApi
+export const { test, to, action, defer, pending, named, step, cleanup, onFinish } = singletonApi

@@ -1,4 +1,4 @@
-function walkSteps (root, visit) {
+export default function walkSteps (root, visit) {
   const traverse = (node) => {
     visit(node)
     if (node.children) for (const child of node.children) traverse(child)
@@ -6,4 +6,3 @@ function walkSteps (root, visit) {
   for (const child of root.children) traverse(child)
 }
 
-module.exports = walkSteps

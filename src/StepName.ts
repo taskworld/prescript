@@ -1,8 +1,8 @@
-const chalk = require('chalk')
-const invariant = require('invariant')
+import chalk from 'chalk'
+import invariant from 'invariant'
 
-function parse (string) {
-  const placeholders = [ ]
+export function parse (string: string): StepName {
+  const placeholders: string[] = [ ]
   const stringedParts = string.replace(/`([^`]+?)`/g, (a, x) => {
     placeholders.push(x)
     return '\0'
@@ -10,7 +10,7 @@ function parse (string) {
   return new StepName(stringedParts.split('\0'), placeholders)
 }
 
-function coerce (stepNameOrString) {
+export function coerce (stepNameOrString: StepName | string): StepName {
   if (typeof stepNameOrString === 'string') {
     return parse(stepNameOrString)
   }
@@ -26,22 +26,22 @@ function coerce (stepNameOrString) {
     )
     return stepName
   }
-  invariant(false, 'Step name should be a string or a tagged `named` literal.')
+  throw invariant(false, 'Step name should be a string or a tagged `named` literal.')
 }
 
 /**
  * Creates a step name. Use this as tagged template string.
  */
-function named (parts, ...placeholders) {
+export function named (parts: string[], ...placeholders: string[]) {
   return new StepName(parts, placeholders)
 }
 
-function format (stepName, { colors = true } = { }) {
+export function format (stepName: StepName | string, { colors = true } = { }) {
   if (typeof stepName === 'string') {
     return stepName
   }
   const { parts, placeholders } = stepName
-  const resultParts = [ ]
+  const resultParts: string[] = [ ]
   for (let i = 0; i < parts.length; i++) {
     resultParts.push(parts[i])
     if (placeholders[i]) {
@@ -54,15 +54,8 @@ function format (stepName, { colors = true } = { }) {
   return resultParts.join('')
 }
 
-exports.named = named
-exports.parse = parse
-exports.coerce = coerce
-exports.format = format
-
-class StepName {
-  constructor (parts, placeholders) {
-    this.parts = parts
-    this.placeholders = placeholders
+export class StepName {
+  constructor (public parts: string[], public placeholders: string[]) {
   }
   toString () {
     return format(this, { colors: false })

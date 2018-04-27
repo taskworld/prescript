@@ -1,16 +1,39 @@
-const path = require('path')
-const chalk = require('chalk')
-const StepName = require('./StepName')
-const ErrorStackParser = require('error-stack-parser')
-const prettyFormatStep = require('./prettyFormatStep')
+import path from 'path'
+import chalk from 'chalk'
+import * as StepName from './StepName'
+import ErrorStackParser from 'error-stack-parser'
+import prettyFormatStep from './prettyFormatStep'
+import { IStep, ITestPrescriptionContext, ITestExecutionContext, ActionFunction, StepDefName, ITestLoadLogger } from './types';
 
-function loadTest (testModule, { logger = createConsoleLogger() } = { }) {
-  const finishActions = [ ]
-  let currentStep
+type StackTrace = ErrorStackParser.StackFrame[]
 
-  logger = logger || createNullLogger()
+function loadTest (
+  testModule: (context: ITestPrescriptionContext) => void,
+  options: { logger?: ITestLoadLogger | null } = { }
+) {
+  const { logger: inLogger = createConsoleLogger() } = options
+  const finishActions: {
+    action: () => void,
+    definition: string,
+    cause?: string
+  }[] = [ ]
+  const tests = [ ]
+  let currentStep: IStep | null
 
-  function appendStep ({ name, creator, definition, cleanup, defer, pending }, f) {
+  const logger: ITestLoadLogger = inLogger || createNullLogger()
+
+  function appendStep<X> (options: {
+    name: StepName.StepName,
+    creator?: string,
+    definition: string,
+    cleanup?: boolean,
+    defer?: boolean,
+    pending?: boolean
+  }, f: () => X): X {
+    const { name, creator, definition, cleanup, defer, pending } = options
+    if (!currentStep) {
+      throw new Error('Invalid state... This should not happen!')
+    }
     if (currentStep.action) {
       throw new Error('A step may only have an action or sub-steps but not both.')
     }
@@ -19,7 +42,7 @@ function loadTest (testModule, { logger = createConsoleLogger() } = { }) {
       parentStep.children = [ ]
     }
     const number = (parentStep.number ? parentStep.number + '.' : '') + (parentStep.children.length + 1)
-    const childStep = { name, creator, definition, cleanup, number, pending, defer }
+    const childStep: IStep = { name, creator, definition, cleanup, number, pending, defer }
     parentStep.children.push(childStep)
     logger.step(childStep)
     try {
@@ -34,7 +57,10 @@ function loadTest (testModule, { logger = createConsoleLogger() } = { }) {
     }
   }
 
-  function setAction (f, definition) {
+  function setAction (f: ActionFunction, definition: string) {
+    if (!currentStep) {
+      throw new Error('Invalid state... This should not happen!')
+    }
     if (currentStep.action) {
       throw new Error('A step may only have one action block.')
     }
@@ -45,79 +71,85 @@ function loadTest (testModule, { logger = createConsoleLogger() } = { }) {
     currentStep.actionDefinition = definition
   }
 
-  function getSource (stackTrace) {
+  function getSource (stackTrace: StackTrace) {
     const stackFrame = stackTrace.filter(frame =>
-      path.relative(__dirname, frame.fileName).startsWith('..')
+      frame.fileName && path.relative(__dirname, frame.fileName).startsWith('..')
     )[0]
     if (!stackFrame) return '(unknown)'
     return stackFrame.fileName + ':' + stackFrame.lineNumber
   }
 
-  const context = {
-    step (name, f) {
-      name = StepName.coerce(name)
+  const context: ITestPrescriptionContext = {
+    step<X> (inName: StepDefName, f: () => X): X {
+      const name = StepName.coerce(inName)
       const definition = getSource(ErrorStackParser.parse(new Error(`Step: ${name}`)))
       return appendStep({ name, definition }, f)
     },
-    test (name, f) {
+    test<X> (name: StepDefName, f: () => X): X {
       return f()
     },
-    cleanup (name, f) {
-      name = StepName.coerce(name)
+    cleanup<X> (inName: StepDefName, f: () => X): X {
+      const name = StepName.coerce(inName)
       const definition = getSource(ErrorStackParser.parse(new Error(`Cleanup step: ${name}`)))
       return appendStep({ name, definition, cleanup: true }, f)
     },
-    onFinish (f) {
+    onFinish (f: () => void): void {
+      if (!currentStep) {
+        throw new Error('Invalid state... This should not happen!')
+      }
       const definition = getSource(ErrorStackParser.parse(new Error(`onFinish`)))
       const cause = currentStep.number
       finishActions.push({ action: f, definition, cause })
     },
-    use (m) {
+    use<X> (m: (context: ITestPrescriptionContext) => X): X {
       return m(context)
     },
-    action (name, f) {
-      if (!f) {
+    action<X> (arg0: StepDefName | ActionFunction, arg1?: ActionFunction): void {
+      if (!arg1) {
         const definition = getSource(ErrorStackParser.parse(new Error(`Action definition`)))
-        f = name
+        const f = arg0 as ActionFunction
         return setAction(f, definition)
       } else {
+        const name = StepName.coerce(arg0 as StepDefName)
+        const f = arg1 as ActionFunction
         const definition = getSource(ErrorStackParser.parse(new Error(`Action: ${name}`)))
         return appendStep({ name, definition }, () => {
           return setAction(f, definition)
         })
       }
     },
-    defer (name, f) {
+    defer<X> (inName: StepDefName, f: ActionFunction) {
+      const name = StepName.coerce(inName)
       const definition = getSource(ErrorStackParser.parse(new Error(`Defer: {$name}`)))
       return appendStep({ name, definition, defer: true }, () => {
         return setAction(f, definition)
       })
     },
-    to (name, f) {
-      name = StepName.coerce(name)
+    to<X> (inName: string, f: () => X): X {
+      const name = StepName.coerce(inName)
       const definition = getSource(ErrorStackParser.parse(new Error(`Step: ${name}`)))
       return appendStep({ name, definition }, f)
     },
     pending () {
       const error = new Error('[pending]')
-      error.__prescriptPending = true
+      ;(error as any).__prescriptPending = true
       const definition = getSource(ErrorStackParser.parse(new Error(`Pending`)))
-      return appendStep({ name: 'Pending', definition, pending: true }, () => {
+      return appendStep({ name: StepName.coerce('Pending'), definition, pending: true }, () => {
         context.action(() => { throw error })
       })
     }
   }
 
   function load () {
-    const root = currentStep = {
-      name: '(root)',
+    const root: IStep = currentStep = {
+      name: StepName.coerce('(root)'),
       children: [ ]
     }
     try {
       testModule(context)
       for (const entry of finishActions) {
         appendStep({
-          name: 'Post-test actions',
+          name: StepName.coerce('Post-test actions'),
           creator: entry.cause,
           definition: entry.definition,
           cleanup: true
@@ -136,7 +168,7 @@ function loadTest (testModule, { logger = createConsoleLogger() } = { }) {
 
 function createConsoleLogger () {
   return {
-    step (step) {
+    step (step: IStep) {
       console.log(
         chalk.dim((step.defer ? 'Deferred ' : '') + 'Step'),
         prettyFormatStep(step)
@@ -152,4 +184,4 @@ function createNullLogger () {
   }
 }
 
-module.exports = loadTest
+export default loadTest

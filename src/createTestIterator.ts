@@ -1,6 +1,8 @@
+import { IIterationListener, IVisitor, IStep, ITestIterator } from "./types";
+import * as StepName from "./StepName";
 
-function createTestIterator (visitor, iterationListener) {
-  let test = { children: [ ], name: '(not loaded)' }
+export default function createTestIterator (visitor?, iterationListener?): ITestIterator {
+  let test: IStep = { children: [ ], name: StepName.coerce('(not loaded)') }
   let stepper
 
   return {
@@ -11,7 +13,7 @@ function createTestIterator (visitor, iterationListener) {
     getTest () {
       return test
     },
-    begin (beginningStep) {
+    begin (beginningStep?) {
       stepper = createStepper(test, beginningStep, visitor, iterationListener)
     },
     getCurrentStepNumber () {
@@ -37,10 +39,10 @@ function createTestIterator (visitor, iterationListener) {
   }
 }
 
-function createStepper (test, beginningStep, visitor, iterationListener = { }) {
+function createStepper (test, beginningStep?, visitor?: Partial<IVisitor>, iterationListener: Partial<IIterationListener> = { }) {
   function * generateSteps () {
     let found = !beginningStep
-    const deferredSteps = []
+    const deferredSteps: IStep[] = []
     yield * walk(test)
     for (const step of deferredSteps) {
       yield * walk(step)
@@ -101,5 +103,3 @@ function createStepper (test, beginningStep, visitor, iterationListener = { }) {
     }
   }
 }
-
-module.exports = createTestIterator

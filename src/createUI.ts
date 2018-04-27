@@ -1,26 +1,26 @@
-const chalk = require('chalk')
-const util = require('util')
-const prettyFormatStep = require('./prettyFormatStep')
+import chalk from 'chalk'
+import util from 'util'
+import prettyFormatStep from './prettyFormatStep'
 
-module.exports = function createUI () {
+export default function createUI () {
   const ui = {
     testLoadStarted () {
       console.log(chalk.bold.yellow('## Loading test and generating test plan...'))
     },
-    testLoadCompleted () {
+    testLoadCompleted (test) {
       console.log(chalk.dim('* ') + chalk.green('Test plan generated successfully!'))
       console.log()
     },
-    testLoadError (e) {
+    testLoadError (e: Error) {
       console.log(chalk.bold.red('Cannot load the test file.'))
-      console.log(chalk.red(e.stack))
+      console.log(chalk.red(e.stack || 'Unknown stack trace...'))
       console.log()
     },
 
     moduleUncacheStarted () {
       console.log(chalk.bold.yellow('## Clearing Node module cache...'))
     },
-    moduleUncached (key) {
+    moduleUncached (key: string) {
       console.log(chalk.dim('*'), 'Reloading', chalk.cyan(key))
     },
     moduleUncacheCompleted () {
