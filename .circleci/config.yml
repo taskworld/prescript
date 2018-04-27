@@ -31,7 +31,7 @@ jobs:
           name: allure
           command: |
             mkdir -p /tmp/allure-report
-            npm install -g allure-commandline
+            sudo npm install -g allure-commandline
             allure generate allure-results -o "/tmp/allure-report"
       - store_artifacts:
           path: /tmp/allure-report
