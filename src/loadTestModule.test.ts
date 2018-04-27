@@ -1,16 +1,16 @@
 /* eslint-env jest */
 import loadTestModule from './loadTestModule'
 import walkSteps from './walkSteps'
-import { IStep } from './types';
+import { IStep } from './types'
 
-function load (testModule) {
+function load(testModule) {
   return loadTestModule(testModule, { logger: null })
 }
 
 describe('a test module', () => {
   it('can be empty', () => {
     const tests = load(({ step, test }) => {
-      test('Meow', () => { })
+      test('Meow', () => {})
     })
     expect(tests[0].children!.length).toBe(0)
   })
@@ -19,14 +19,14 @@ describe('a test module', () => {
     const tests = load(({ step, action }) => {
       step('Turn on the computer', () => {
         step('Plug the computer in', () => {
-          action(() => { })
+          action(() => {})
         })
         step('Press the power button', () => {
-          action(() => { })
+          action(() => {})
         })
       })
       step('Write tests', () => {
-        action(() => { })
+        action(() => {})
       })
     })
     expect(numberedDescriptionsOf(tests[0])).toEqual([
@@ -40,17 +40,15 @@ describe('a test module', () => {
   it('cannot have an empty step', () => {
     expect(() => {
       load(({ step }) => {
-        step('Step A', () => {
-        })
+        step('Step A', () => {})
       })
-    })
-    .toThrowError(/empty step/)
+    }).toThrowError(/empty step/)
   })
 })
 
-function numberedDescriptionsOf (root: IStep) {
-  const out: string[] = [ ]
-  walkSteps(root, (step) => {
+function numberedDescriptionsOf(root: IStep) {
+  const out: string[] = []
+  walkSteps(root, step => {
     out.push(`${step.number}. ${step.name}`)
   })
   return out

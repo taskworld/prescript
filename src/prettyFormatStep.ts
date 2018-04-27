@@ -2,9 +2,11 @@ import chalk from 'chalk'
 import * as StepName from './StepName'
 import { IStep } from './types'
 
-export default function prettyFormatStep (step: IStep) {
+export default function prettyFormatStep(step: IStep) {
   let result = ''
-  const write = (stuff: string) => { result += stuff }
+  const write = (stuff: string) => {
+    result += stuff
+  }
   const numberParts = (step.number || '').split('.')
   const frontNumber = numberParts.slice(0, -1).join('.')
   const lastNumber = numberParts[numberParts.length - 1]

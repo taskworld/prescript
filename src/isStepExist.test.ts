@@ -2,7 +2,7 @@
 import loadTestModule from './loadTestModule'
 import isStepExist from './isStepExist'
 
-function load (testModule) {
+function load(testModule) {
   return loadTestModule(testModule, { logger: null })
 }
 
@@ -10,12 +10,12 @@ describe('isStepExist', () => {
   const tests = load(({ step, action }) => {
     step('Step 1', () => {
       step('step 1.1', () => {
-        action(() => { })
+        action(() => {})
       })
     })
     step('step 2', () => {
       step('step 2.1', () => {
-        action(() => { })
+        action(() => {})
       })
     })
   })

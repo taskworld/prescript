@@ -5,12 +5,12 @@ let failures = 0
 
 console.log('Checking if all examples work!')
 
-function runTest (file, testName, { onMulti } = { }) {
+function runTest(file, testName, { onMulti } = {}) {
   const title = `${file}${testName ? ` => ${testName}` : ''}`
   try {
     require('child_process').execFileSync('./bin/prescript', [
       file,
-      ...testName ? [ testName ] : [ ]
+      ...(testName ? [testName] : [])
     ])
     console.log(chalk.bgGreen.bold(' OK '), title)
   } catch (e) {
@@ -29,12 +29,11 @@ function runTest (file, testName, { onMulti } = { }) {
 
 for (const file of glob.sync('examples/*/tests/**/*.js')) {
   runTest(file, null, {
-    onMulti () {
-      const testNamesJSON = require('child_process').execFileSync('./bin/prescript', [
-        file,
-        '--list',
-        '--json'
-      ])
+    onMulti() {
+      const testNamesJSON = require('child_process').execFileSync(
+        './bin/prescript',
+        [file, '--list', '--json']
+      )
       const testNames = JSON.parse(testNamesJSON)
       for (const name of testNames) {
         runTest(file, name)

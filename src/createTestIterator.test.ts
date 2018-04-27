@@ -2,7 +2,7 @@
 import loadTestModule from './loadTestModule'
 import createTestIterator from './createTestIterator'
 
-function load (testModule) {
+function load(testModule) {
   return loadTestModule(testModule, { logger: null })[0]
 }
 
@@ -11,14 +11,14 @@ describe('a test iterator', () => {
     const test = load(({ step, action }) => {
       step('Turn on the computer', () => {
         step('Plug the computer in', () => {
-          action(() => { })
+          action(() => {})
         })
         step('Press the power button', () => {
-          action(() => { })
+          action(() => {})
         })
       })
       step('Write tests', () => {
-        action(() => { })
+        action(() => {})
       })
     })
     it('maintains the test state', () => {
@@ -64,24 +64,24 @@ describe('a test iterator', () => {
   describe('a test with cleanup step', () => {
     const test = load(({ step, action, cleanup }) => {
       step('Open browser', () => {
-        action(() => { })
+        action(() => {})
       })
       step('Do something', () => {
-        action(() => { })
+        action(() => {})
       })
       step('Do something else', () => {
         step('Create file', () => {
-          action(() => { })
+          action(() => {})
         })
         cleanup('Delete file', () => {
-          action(() => { })
+          action(() => {})
         })
       })
       step('Do something more', () => {
-        action(() => { })
+        action(() => {})
       })
       cleanup('Close browser', () => {
-        action(() => { })
+        action(() => {})
       })
     })
     it('should run the cleanup step in normal run', () => {
@@ -128,19 +128,35 @@ describe('a test iterator', () => {
   describe('replacing test', () => {
     it('clears the program counter', () => {
       const tester = createTestIterator()
-      tester.setTest(load(({ step, action }) => {
-        step('Step 1', () => { action(() => { }) })
-        step('Step 2', () => { action(() => { }) })
-        step('Step 3', () => { action(() => { }) })
-      }))
+      tester.setTest(
+        load(({ step, action }) => {
+          step('Step 1', () => {
+            action(() => {})
+          })
+          step('Step 2', () => {
+            action(() => {})
+          })
+          step('Step 3', () => {
+            action(() => {})
+          })
+        })
+      )
       tester.begin() // 1
       tester.actionPassed() // 2
       expect(tester.getCurrentStepNumber()).toBe('2')
-      tester.setTest(load(({ step, action }) => {
-        step('Step X', () => { action(() => { }) })
-        step('Step Y', () => { action(() => { }) })
-        step('Step Z', () => { action(() => { }) })
-      }))
+      tester.setTest(
+        load(({ step, action }) => {
+          step('Step X', () => {
+            action(() => {})
+          })
+          step('Step Y', () => {
+            action(() => {})
+          })
+          step('Step Z', () => {
+            action(() => {})
+          })
+        })
+      )
       expect(tester.getCurrentStepNumber()).toBe(null)
     })
   })

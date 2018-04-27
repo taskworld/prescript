@@ -1,8 +1,8 @@
 import chalk from 'chalk'
 import invariant from 'invariant'
 
-export function parse (string: string): StepName {
-  const placeholders: string[] = [ ]
+export function parse(string: string): StepName {
+  const placeholders: string[] = []
   const stringedParts = string.replace(/`([^`]+?)`/g, (a, x) => {
     placeholders.push(x)
     return '\0'
@@ -10,7 +10,7 @@ export function parse (string: string): StepName {
   return new StepName(stringedParts.split('\0'), placeholders)
 }
 
-export function coerce (stepNameOrString: StepName | string): StepName {
+export function coerce(stepNameOrString: StepName | string): StepName {
   if (typeof stepNameOrString === 'string') {
     return parse(stepNameOrString)
   }
@@ -26,28 +26,30 @@ export function coerce (stepNameOrString: StepName | string): StepName {
     )
     return stepName
   }
-  throw invariant(false, 'Step name should be a string or a tagged `named` literal.')
+  throw invariant(
+    false,
+    'Step name should be a string or a tagged `named` literal.'
+  )
 }
 
 /**
  * Creates a step name. Use this as tagged template string.
  */
-export function named (parts: TemplateStringsArray, ...placeholders: string[]) {
-  return new StepName([ ...parts ], placeholders)
+export function named(parts: TemplateStringsArray, ...placeholders: string[]) {
+  return new StepName([...parts], placeholders)
 }
 
-export function format (stepName: StepName | string, { colors = true } = { }) {
+export function format(stepName: StepName | string, { colors = true } = {}) {
   if (typeof stepName === 'string') {
     return stepName
   }
   const { parts, placeholders } = stepName
-  const resultParts: string[] = [ ]
+  const resultParts: string[] = []
   for (let i = 0; i < parts.length; i++) {
     resultParts.push(parts[i])
     if (placeholders[i]) {
-      resultParts.push(colors
-        ? chalk.cyan(String(placeholders[i]))
-        : `‘${placeholders[i]}’`
+      resultParts.push(
+        colors ? chalk.cyan(String(placeholders[i])) : `‘${placeholders[i]}’`
       )
     }
   }
@@ -55,9 +57,8 @@ export function format (stepName: StepName | string, { colors = true } = { }) {
 }
 
 export class StepName {
-  constructor (public parts: string[], public placeholders: string[]) {
-  }
-  toString () {
+  constructor(public parts: string[], public placeholders: string[]) {}
+  toString() {
     return format(this, { colors: false })
   }
 }

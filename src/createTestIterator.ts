@@ -1,53 +1,61 @@
-import { IIterationListener, IVisitor, IStep, ITestIterator } from "./types";
-import * as StepName from "./StepName";
+import { IIterationListener, IVisitor, IStep, ITestIterator } from './types'
+import * as StepName from './StepName'
 
-export default function createTestIterator (visitor?, iterationListener?): ITestIterator {
-  let test: IStep = { children: [ ], name: StepName.coerce('(not loaded)') }
+export default function createTestIterator(
+  visitor?,
+  iterationListener?
+): ITestIterator {
+  let test: IStep = { children: [], name: StepName.coerce('(not loaded)') }
   let stepper
 
   return {
-    setTest (_test) {
+    setTest(_test) {
       test = _test
       stepper = null
     },
-    getTest () {
+    getTest() {
       return test
     },
-    begin (beginningStep?) {
+    begin(beginningStep?) {
       stepper = createStepper(test, beginningStep, visitor, iterationListener)
     },
-    getCurrentStepNumber () {
+    getCurrentStepNumber() {
       if (!stepper) return null
       if (stepper.isDone()) return null
       return stepper.getCurrentStep().number
     },
-    getCurrentStep () {
+    getCurrentStep() {
       if (!stepper) throw new Error('Test not started.')
       if (stepper.isDone()) throw new Error('Test already finished.')
       return stepper.getCurrentStep()
     },
-    isDone () {
+    isDone() {
       if (!stepper) return false
       return stepper.isDone()
     },
-    actionPassed () {
+    actionPassed() {
       stepper.actionPassed()
     },
-    actionFailed (error) {
+    actionFailed(error) {
       stepper.actionFailed(error)
     }
   }
 }
 
-function createStepper (test, beginningStep?, visitor?: Partial<IVisitor>, iterationListener: Partial<IIterationListener> = { }) {
-  function * generateSteps () {
+function createStepper(
+  test,
+  beginningStep?,
+  visitor?: Partial<IVisitor>,
+  iterationListener: Partial<IIterationListener> = {}
+) {
+  function* generateSteps() {
     let found = !beginningStep
     const deferredSteps: IStep[] = []
-    yield * walk(test)
+    yield* walk(test)
     for (const step of deferredSteps) {
-      yield * walk(step)
+      yield* walk(step)
     }
-    function * walk (node) {
+    function* walk(node) {
       if (!found && node.number === beginningStep) {
         found = true
       }
@@ -76,7 +84,7 @@ function createStepper (test, beginningStep?, visitor?: Partial<IVisitor>, itera
             }
             deferredSteps.push(child)
           } else if (child.cleanup || stillOk) {
-            stillOk = (yield * walk(child)) && stillOk
+            stillOk = (yield* walk(child)) && stillOk
           }
         }
         if (iterationListener.onExit) {
@@ -89,16 +97,16 @@ function createStepper (test, beginningStep?, visitor?: Partial<IVisitor>, itera
   const iterator = generateSteps()
   let currentState = iterator.next()
   return {
-    isDone () {
+    isDone() {
       return currentState.done
     },
-    getCurrentStep () {
+    getCurrentStep() {
       return currentState.value
     },
-    actionPassed () {
+    actionPassed() {
       currentState = iterator.next({ ok: true })
     },
-    actionFailed (error) {
+    actionFailed(error) {
       currentState = iterator.next({ ok: false, error })
     }
   }
