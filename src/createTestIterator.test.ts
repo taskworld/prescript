@@ -1,9 +1,9 @@
 /* eslint-env jest */
-const loadTestModule = require('./loadTestModule')
-const createTestIterator = require('./createTestIterator')
+import loadTestModule from './loadTestModule'
+import createTestIterator from './createTestIterator'
 
 function load (testModule) {
-  return loadTestModule(testModule, { logger: false })
+  return loadTestModule(testModule, { logger: null })[0]
 }
 
 describe('a test iterator', () => {
@@ -56,7 +56,7 @@ describe('a test iterator', () => {
       tester.setTest(test)
       tester.begin()
       expect(tester.getCurrentStepNumber()).toBe('1.1')
-      tester.actionFailed()
+      tester.actionFailed(new Error('!!!'))
       expect(tester.getCurrentStepNumber()).toBe(null)
     })
   })
@@ -108,7 +108,7 @@ describe('a test iterator', () => {
       tester.begin() // 1
       tester.actionPassed() // 2
       tester.actionPassed() // 3.1
-      tester.actionFailed() // 3.2 (cleanup)
+      tester.actionFailed(new Error('!!!')) // 3.2 (cleanup)
       tester.actionPassed() // 5
       expect(tester.getCurrentStepNumber()).toBe('5')
       tester.actionPassed()
@@ -118,7 +118,7 @@ describe('a test iterator', () => {
       const tester = createTestIterator()
       tester.setTest(test)
       tester.begin() // 1
-      tester.actionFailed() // 5
+      tester.actionFailed(new Error('!!!')) // 5
       expect(tester.getCurrentStepNumber()).toBe('5')
       tester.actionPassed()
       expect(tester.getCurrentStepNumber()).toBe(null)

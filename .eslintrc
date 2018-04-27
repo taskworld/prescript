@@ -1,0 +1,9 @@
+parser: typescript-eslint-parser
+parserOptions:
+  ecmaVersion: 2017
+  sourceType: module
+plugins:
+  - prettier
+extends:
+  - eslint:recommended
+  - plugin:prettier/recommended

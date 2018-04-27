@@ -1,13 +1,13 @@
 /* eslint-env jest */
-const loadTestModule = require('./loadTestModule')
-const isStepExist = require('./isStepExist')
+import loadTestModule from './loadTestModule'
+import isStepExist from './isStepExist'
 
 function load (testModule) {
-  return loadTestModule(testModule, { logger: false })
+  return loadTestModule(testModule, { logger: null })
 }
 
 describe('isStepExist', () => {
-  const test = load(({ step, action }) => {
+  const tests = load(({ step, action }) => {
     step('Step 1', () => {
       step('step 1.1', () => {
         action(() => { })
@@ -20,9 +20,9 @@ describe('isStepExist', () => {
     })
   })
   it('should be able to determined if steps exists', () => {
-    expect(isStepExist(test, '1.1')).toEqual(true)
+    expect(isStepExist(tests[0], '1.1')).toEqual(true)
   })
   it('should be able to determined if steps not exists', () => {
-    expect(isStepExist(test, '1.2')).toEqual(false)
+    expect(isStepExist(tests[0], '1.2')).toEqual(false)
   })
 })
