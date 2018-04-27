@@ -269,7 +269,7 @@ function runNonInteractiveMode(
 
   async function runTest() {
     const state = {}
-    const reporter = createReporter(testModulePath)
+    const reporter = createReporter(testModulePath, tests[0].name)
     const tester = createTestIterator(
       createLogVisitor(),
       reporter.iterationListener
