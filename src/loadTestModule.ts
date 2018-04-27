@@ -24,11 +24,12 @@ function loadTest(
   const { logger: inLogger = createConsoleLogger() } = options
 
   const implicitRoot: IStep = {
-    name: StepName.coerce('(root)'),
+    name: StepName.named`[implicit test]`,
     children: []
   }
 
   const tests: IStep[] = []
+  const usedTestNames = {}
 
   let currentStep: IStep | null
   let currentTest: ITest | null
@@ -137,6 +138,13 @@ function loadTest(
         throw new Error('test() calls may not be nested.')
       }
       const name = StepName.coerce(inName)
+      const nameStr = String(name)
+      if (usedTestNames[nameStr]) {
+        throw new Error(
+          `Test name must be unique. A test named "${nameStr}" has already been declared.`
+        )
+      }
+      usedTestNames[nameStr] = true
       const root = (currentStep = {
         name: name,
         children: []

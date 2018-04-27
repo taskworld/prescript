@@ -44,6 +44,19 @@ describe('a test module', () => {
       })
     }).toThrowError(/empty step/)
   })
+
+  it('cannot have multiple tests with same name', () => {
+    expect(() => {
+      load(({ test, action }) => {
+        test('A', () => {
+          action('wow', () => {})
+        })
+        test('A', () => {
+          action('wow', () => {})
+        })
+      })
+    }).toThrowError(/Test name must be unique/)
+  })
 })
 
 function numberedDescriptionsOf(root: IStep) {

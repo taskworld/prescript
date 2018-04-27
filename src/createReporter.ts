@@ -1,6 +1,6 @@
 import path from 'path'
 
-export default function createReporter(testModulePath) {
+export default function createReporter(testModulePath, rootStepName) {
   if (
     !process.env.ALLURE_SUITE_NAME &&
     !process.env.ALLURE_RESULTS_DIR &&
@@ -9,8 +9,13 @@ export default function createReporter(testModulePath) {
     return { onFinish(errors: Error[]) {}, iterationListener: {} }
   }
   const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
-  const caseName =
-    process.env.ALLURE_CASE_NAME || path.relative(process.cwd(), testModulePath)
+  const getDefaultCaseName = () => {
+    const testPath = path.relative(process.cwd(), testModulePath)
+    const rawTestName = String(rootStepName)
+    const testName = rawTestName === '[implicit test]' ? '' : rawTestName
+    return `${testPath}${testName ? ` - ${testName}` : ''}`
+  }
+  const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
   const Allure = require('allure-js-commons')
   const allure = new Allure()
   if (process.env.ALLURE_RESULTS_DIR) {
