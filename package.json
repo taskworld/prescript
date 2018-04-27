@@ -26,6 +26,7 @@
     "@types/jest": "^22.2.3",
     "@types/ms": "^0.7.30",
     "@types/node": "^10.0.0",
+    "eslint": "^4.19.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-prettier": "^2.6.0",
     "glob": "^7.1.2",
