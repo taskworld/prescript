@@ -37,6 +37,7 @@
     "typescript-eslint-parser": "^15.0.0"
   },
   "scripts": {
+    "lint": "eslint . --ext .ts,.js",
     "test": "jest",
     "test-examples": "node examples/testAll.js"
   },

@@ -7,3 +7,9 @@ plugins:
 extends:
   - eslint:recommended
   - plugin:prettier/recommended
+env:
+  node: true
+rules:
+  no-console: off
+  no-undef: off
+  no-unused-vars: off
