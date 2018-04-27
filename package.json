@@ -38,6 +38,7 @@
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.js",
+    "build": "tsc",
     "test": "jest",
     "test-examples": "node examples/testAll.js"
   },

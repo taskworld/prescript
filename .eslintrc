@@ -11,5 +11,6 @@ env:
   node: true
 rules:
   no-console: off
+  # Let TypeScript compiler check for these!
   no-undef: off
   no-unused-vars: off

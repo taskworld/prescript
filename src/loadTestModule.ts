@@ -6,7 +6,6 @@ import prettyFormatStep from './prettyFormatStep'
 import {
   IStep,
   ITestPrescriptionContext,
-  ITestExecutionContext,
   ActionFunction,
   StepDefName,
   ITestLoadLogger

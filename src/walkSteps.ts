@@ -5,5 +5,5 @@ export default function walkSteps(root: IStep, visit: (node: IStep) => void) {
     visit(node)
     if (node.children) for (const child of node.children) traverse(child)
   }
-  for (const child of root.children) traverse(child)
+  for (const child of root.children || []) traverse(child)
 }

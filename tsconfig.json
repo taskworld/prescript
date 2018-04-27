@@ -9,7 +9,8 @@
     "esModuleInterop": true,
     "outDir": "lib",
     "skipLibCheck": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "noUnusedLocals": true
   },
   "include": [
     "src/**/*"
