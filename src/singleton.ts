@@ -1,4 +1,4 @@
-import loadTestModule from './loadTestModule'
+import loadTestModule, { ITestLoadOptions } from './loadTestModule'
 import { IStep } from './types'
 
 const key = '__prescriptSingletonInstance(╯°□°）╯︵ ┻━┻'
@@ -11,12 +11,12 @@ export function getInstance () {
   return _global[key]
 }
 
-export function loadTest (f: Function): IStep {
+export function loadTests (f: Function, options: ITestLoadOptions = { }): IStep[] {
   try {
     return loadTestModule((context) => {
       _global[key] = context
       f()
-    })
+    }, options)
   } finally {
     _global[key] = null
   }

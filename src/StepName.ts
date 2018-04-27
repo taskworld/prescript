@@ -32,8 +32,8 @@ export function coerce (stepNameOrString: StepName | string): StepName {
 /**
  * Creates a step name. Use this as tagged template string.
  */
-export function named (parts: string[], ...placeholders: string[]) {
-  return new StepName(parts, placeholders)
+export function named (parts: TemplateStringsArray, ...placeholders: string[]) {
+  return new StepName([ ...parts ], placeholders)
 }
 
 export function format (stepName: StepName | string, { colors = true } = { }) {

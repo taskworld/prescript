@@ -7,18 +7,25 @@ import { IStep, ITestPrescriptionContext, ITestExecutionContext, ActionFunction,
 
 type StackTrace = ErrorStackParser.StackFrame[]
 
+export interface ITestLoadOptions {
+  logger?: ITestLoadLogger | null
+}
+
 function loadTest (
   testModule: (context: ITestPrescriptionContext) => void,
-  options: { logger?: ITestLoadLogger | null } = { }
-) {
+  options: ITestLoadOptions = { }
+): IStep[] {
   const { logger: inLogger = createConsoleLogger() } = options
-  const finishActions: {
-    action: () => void,
-    definition: string,
-    cause?: string
-  }[] = [ ]
-  const tests = [ ]
+
+  const implicitRoot: IStep = {
+    name: StepName.coerce('(root)'),
+    children: [ ]
+  }
+
+  const tests: IStep[] = [ ]
+
   let currentStep: IStep | null
+  let currentTest: ITest | null
 
   const logger: ITestLoadLogger = inLogger || createNullLogger()
 
@@ -32,7 +39,7 @@ function loadTest (
   }, f: () => X): X {
     const { name, creator, definition, cleanup, defer, pending } = options
     if (!currentStep) {
-      throw new Error('Invalid state... This should not happen!')
+      throw new Error('Invalid state... This should not happen! currentState is null.')
     }
     if (currentStep.action) {
       throw new Error('A step may only have an action or sub-steps but not both.')
@@ -59,7 +66,7 @@ function loadTest (
 
   function setAction (f: ActionFunction, definition: string) {
     if (!currentStep) {
-      throw new Error('Invalid state... This should not happen!')
+      throw new Error('Invalid state... This should not happen! currentStep is null.')
     }
     if (currentStep.action) {
       throw new Error('A step may only have one action block.')
@@ -85,8 +92,33 @@ function loadTest (
       const definition = getSource(ErrorStackParser.parse(new Error(`Step: ${name}`)))
       return appendStep({ name, definition }, f)
     },
-    test<X> (name: StepDefName, f: () => X): X {
-      return f()
+    test<X> (inName: StepDefName, f: () => X): X {
+      if (currentTest && currentTest.root === implicitRoot) {
+        if (implicitRoot.children && implicitRoot.children.length) {
+          throw new Error('An implicit test has been started.')
+        }
+        currentTest = null
+        currentStep = null
+      }
+      if (currentTest) {
+        throw new Error('test() calls may not be nested.')
+      }
+      const name = StepName.coerce(inName)
+      const root = currentStep = {
+        name: name,
+        children: [ ]
+      }
+      logger.test(name)
+      currentTest = createTest(root)
+      tests.push(root)
+      try {
+        const value = f()
+        finishTest()
+        return value
+      } finally {
+        currentStep = null
+        currentTest = null
+      }
     },
     cleanup<X> (inName: StepDefName, f: () => X): X {
       const name = StepName.coerce(inName)
@@ -95,11 +127,14 @@ function loadTest (
     },
     onFinish (f: () => void): void {
       if (!currentStep) {
-        throw new Error('Invalid state... This should not happen!')
+        throw new Error('Invalid state... This should not happen! currentStep is null.')
+      }
+      if (!currentTest) {
+        throw new Error('Invalid state... This should not happen! currentTest is null.')
       }
       const definition = getSource(ErrorStackParser.parse(new Error(`onFinish`)))
       const cause = currentStep.number
-      finishActions.push({ action: f, definition, cause })
+      currentTest.finishActions.push({ action: f, definition, cause })
     },
     use<X> (m: (context: ITestPrescriptionContext) => X): X {
       return m(context)
@@ -140,27 +175,38 @@ function loadTest (
     }
   }
 
-  function load () {
-    const root: IStep = currentStep = {
-      name: StepName.coerce('(root)'),
-      children: [ ]
+  function finishTest () {
+    if (!currentTest) {
+      throw new Error('Invalid state... currentTest is null.')
     }
+    for (const entry of currentTest.finishActions) {
+      appendStep({
+        name: StepName.coerce('Post-test actions'),
+        creator: entry.cause,
+        definition: entry.definition,
+        cleanup: true
+      }, () => {
+        entry.action()
+      })
+    }
+  }
+
+  function load () {
+    currentStep = implicitRoot
+    currentTest = createTest(implicitRoot)
     try {
       testModule(context)
-      for (const entry of finishActions) {
-        appendStep({
-          name: StepName.coerce('Post-test actions'),
-          creator: entry.cause,
-          definition: entry.definition,
-          cleanup: true
-        }, () => {
-          entry.action()
-        })
+      if (currentTest !== null) {
+        finishTest()
       }
     } finally {
       currentStep = null
+      currentTest = null
     }
-    return root
+    if (!tests.length && implicitRoot.children && implicitRoot.children.length) {
+      tests.push(implicitRoot)
+    }
+    return tests
   }
 
   return load()
@@ -173,15 +219,35 @@ function createConsoleLogger () {
         chalk.dim((step.defer ? 'Deferred ' : '') + 'Step'),
         prettyFormatStep(step)
       )
+    },
+    test (name: StepName.StepName) {
+      console.log(
+        chalk.yellow(`### ${StepName.format(name)}`)
+      )
     }
   }
 }
 
 function createNullLogger () {
   return {
-    step () {
+    step (step: IStep) {
+    },
+    test (name: StepName.StepName) {
     }
   }
+}
+
+interface ITest {
+  root: IStep
+  finishActions: {
+    action: () => void,
+    definition: string,
+    cause?: string
+  }[]
+}
+
+function createTest (root: IStep): ITest {
+  return { root, finishActions: [ ] }
 }
 
 export default loadTest

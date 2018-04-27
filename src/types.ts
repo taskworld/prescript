@@ -34,6 +34,7 @@ export interface ITestPrescriptionContext {
 
 export interface ITestLoadLogger {
   step (step: IStep): void
+  test (name: StepName): void
 }
 
 export interface ITestExecutionContext {

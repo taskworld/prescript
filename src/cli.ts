@@ -11,9 +11,67 @@ import isStepExist from './isStepExist'
 import createReporter from './createReporter'
 import prettyFormatStep from './prettyFormatStep'
 import createTestIterator from './createTestIterator'
-import { ITestIterator } from './types';
+import { ITestIterator, IStep } from './types';
+import { StepName } from './StepName';
 
-function runDevelopmentMode (testModulePath: string) {
+function main (args) {
+  const testModulePath = require('fs').realpathSync(args._[0])
+  const requestedTestName = args._[1] || null
+
+  if (args.l || args['list']) {
+    listTests(testModulePath, { json: !!args.json })
+    return
+  }
+
+  console.log(chalk.bold.magenta('# prescript'), 'v' + require('../package').version)
+  console.log()
+
+  const dev = args.d || args['dev']
+  if (dev) {
+    runDevelopmentMode(testModulePath, requestedTestName)
+  } else {
+    runNonInteractiveMode(testModulePath, requestedTestName)
+  }
+}
+
+function listTests (testModulePath: string, options: { json: boolean }) {
+  const writer = options.json
+    ? (() => {
+      let written = false
+      return {
+        start () {
+          process.stdout.write('[ ')
+        },
+        test (name: string) {
+          if (written) process.stdout.write(', ')
+          process.stdout.write(JSON.stringify(name) + '\n')
+          written = true
+        },
+        finish () {
+          process.stdout.write(']\n')
+        }
+      }
+    })()
+    : {
+      start () { },
+      test (name: string) {
+        console.log(name)
+      },
+      finish () { }
+    }
+  writer.start()
+  singleton.loadTests(() => { require(testModulePath) }, {
+    logger: {
+      step () { },
+      test (name: StepName) {
+        writer.test(String(name))
+      }
+    }
+  })
+  writer.finish()
+}
+
+function runDevelopmentMode (testModulePath: string, requestedTestName: string | null) {
   const state = { }
   const tester: ITestIterator = createTestIterator(createLogVisitor())
   const ui = createUI()
@@ -22,9 +80,14 @@ function runDevelopmentMode (testModulePath: string) {
   function loadTest () {
     ui.testLoadStarted()
     try {
-      const test = singleton.loadTest(() => { require(testModulePath) })
-      tester.setTest(test)
-      ui.testLoadCompleted(test)
+      const tests = singleton
+        .loadTests(() => { require(testModulePath) })
+        .filter(filterTest(requestedTestName))
+      if (!tests.length) {
+        throw new Error('To tests found.')
+      }
+      tester.setTest(tests[0])
+      ui.testLoadCompleted(tests)
     } catch (e) {
       ui.testLoadError(e)
     }
@@ -131,11 +194,22 @@ function runDevelopmentMode (testModulePath: string) {
   }
 }
 
-function runNonInteractiveMode (testModulePath) {
+function runNonInteractiveMode (testModulePath: string, requestedTestName: string | null) {
   console.log(chalk.bold.yellow('## Generating test plan...'))
-  const test = singleton.loadTest(() => {
-    require(testModulePath)
-  })
+  const tests = singleton
+    .loadTests(() => { require(testModulePath) })
+    .filter(filterTest(requestedTestName))
+  if (!tests.length) {
+    throw new Error('No tests found.')
+  }
+  if (tests.length > 1) {
+    console.log()
+    console.log(chalk.bold.red('Multiple tests found.'))
+    console.log('  You must specify a test to run.')
+    console.log('  Use `--list` to see a list of tests.')
+    process.exitCode = 3
+    return
+  }
   console.log(chalk.dim('* ') + chalk.green('Test plan generated successfully.'))
   console.log()
 
@@ -148,7 +222,7 @@ function runNonInteractiveMode (testModulePath) {
     const tester = createTestIterator(createLogVisitor(), reporter.iterationListener)
     const errors: Error[] = [ ]
     const started = Date.now()
-    tester.setTest(test)
+    tester.setTest(tests[0])
     tester.begin()
     while (!tester.isDone()) {
       await runNext(tester, state, (e) => errors.push(e))
@@ -237,16 +311,10 @@ async function runNext (tester: ITestIterator, state, onError: (e: Error) => voi
   }
 }
 
-function main (args) {
-  const testModulePath = require('fs').realpathSync(args._[0])
-  console.log(chalk.bold.magenta('# prescript'), 'v' + require('../package').version)
-  console.log()
-
-  const dev = args.d || args['dev']
-  if (dev) {
-    runDevelopmentMode(testModulePath)
-  } else {
-    runNonInteractiveMode(testModulePath)
+function filterTest (requestedTestName: string | null) {
+  return (root: IStep) => {
+    if (!requestedTestName) return true
+    return String(root.name) === requestedTestName
   }
 }
 
