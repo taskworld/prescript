@@ -8,6 +8,12 @@ module.exports = {
       { text: 'Guide', link: '/guide/' },
       { text: 'GitHub', link: 'https://github.com/taskworld/prescript' }
     ],
-    sidebar: ['/guide/', '/guide/tutorial.md']
+    sidebar: [
+      '/guide/',
+      '/guide/tutorial.md',
+      '/guide/writing-tests.md',
+      '/guide/running-a-test.md',
+      '/guide/api.md'
+    ]
   }
 }

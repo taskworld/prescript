@@ -134,12 +134,13 @@ have these components set up:
 
 * **Test orchestrator.** You have many tests, but how do you run them? One by
   one sequentially? In parallel in the same process? Separate processes?
-  Separate machines? On-demand auto-scaling cluster that runs tests? That’s the
-  job of the test orchestrator.
+  Separate machines? On-demand auto-scaling cluster that runs tests? In which
+  order? If they fail, do you retry them? For how many times? Do you retry
+  immediately, or retry at the end of the test batch? That’s the job of the test
+  orchestrator — it determines which tests to run when.
 
-  * **prescript** doesn’t care. A prescript process only runs a single test at a
-    time (but you may run multiple prescript processes in parallel). That means
-    you must write your own orchestrator.
+  * **prescript** doesn’t care. A prescript process only runs a single test
+    once. That means you must write your own orchestrator.
 
 Several testing frameworks, such as [Cypress](https://www.cypress.io/),
 [Codecept](https://codecept.io/) and [Nightwatch](http://nightwatchjs.org/)
