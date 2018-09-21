@@ -17,19 +17,47 @@ export interface IStep {
   defer?: boolean
 }
 
-export interface ITestPrescriptionContext {
+export interface ITestPrescriptionAPI {
+  /**
+   * Creates a test.
+   */
   test<X>(name: StepDefName, f: () => X): X
-  use<X>(f: (context: ITestPrescriptionContext) => X): X
-  action<X>(name: StepDefName, f: ActionFunction): void
-  defer<X>(name: StepDefName, f: ActionFunction): void
+
+  /**
+   * Defines a compound test step.
+   */
   to<X>(name: StepDefName, f: () => X): X
+
+  /**
+   * Defines an action to be run at runtime.
+   */
+  action<X>(name: StepDefName, f: ActionFunction): void
+  /**
+   * Defines an action to be run at runtime.
+   */
+  action<X>(f: ActionFunction): void
+
+  /**
+   * Defines a deferred action, e.g. for cleanup.
+   */
+  defer<X>(name: StepDefName, f: ActionFunction): void
+
+  /**
+   * Defines a pending action to make the test end with pending state.
+   * Useful for unfinished tests.
+   */
   pending(): void
 
-  // Deprecated
+  /** @deprecated Use `to()` instead. */
   step<X>(name: StepDefName, f: () => X): X
+  /** @deprecated Use `defer()` instead. */
   cleanup<X>(name: StepDefName, f: () => X): X
+  /** @deprecated Use `defer()` instead. */
   onFinish(f: () => void): void
-  action<X>(f: ActionFunction): void
+}
+
+export interface ITestPrescriptionContext extends ITestPrescriptionAPI {
+  use<X>(f: (context: ITestPrescriptionContext) => X): X
 }
 
 export interface ITestLoadLogger {
