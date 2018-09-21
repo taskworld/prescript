@@ -14,6 +14,7 @@ import createTestIterator from './createTestIterator'
 import { ITestIterator, IStep, ITestLoadLogger } from './types'
 import { StepName } from './StepName'
 import { createConsoleLogger } from './loadTestModule'
+import { state } from './globalState'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
@@ -84,7 +85,6 @@ function runDevelopmentMode(
   testModulePath: string,
   requestedTestName: string | null
 ) {
-  const state = {}
   const tester: ITestIterator = createTestIterator(createLogVisitor())
   const ui = createUI()
   let previousResult: { stepNumber: string | null; error?: Error } | null = null
@@ -268,7 +268,6 @@ function runNonInteractiveMode(
   )
 
   async function runTest() {
-    const state = {}
     const reporter = createReporter(testModulePath, tests[0].name)
     const tester = createTestIterator(
       createLogVisitor(),
