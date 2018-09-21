@@ -10,9 +10,8 @@
     "outDir": "lib",
     "skipLibCheck": true,
     "noImplicitAny": false,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "rootDir": "src"
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }
