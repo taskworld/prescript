@@ -1,15 +1,14 @@
+# prescript
 
-# prescript - an acceptance test runner [![CircleCI](https://circleci.com/gh/taskworld/prescript/tree/master.svg?style=svg)](https://circleci.com/gh/taskworld/prescript/tree/master)
+**prescript** is a JavaScript test micro-framework that helps make it fun to write end-to-end/acceptance tests.
 
-__prescript__ is a JavaScript test micro-framework that helps make it fun to write end-to-end/acceptance tests.
+> **Note:** It is quite hard to explain in writing. I recommend watching this very short video demo instead. But I haven’t produced the video yet :\(. Check back later then :\)
 
-> __Note:__ It is quite hard to explain in writing. I recommend watching this very short video demo instead. But I haven’t produced the video yet :(. Check back later then :)
-
-Writing end-to-end tests (e.g. using Selenium) with unit-testing frameworks such as Mocha can sometimes be painful, because when some command fails to run, you need to re-run the test from the beginning to verify that you fixed it. End-to-end tests is usually very slow compared to unit tests.
+Writing end-to-end tests \(e.g. using Selenium\) with unit-testing frameworks such as Mocha can sometimes be painful, because when some command fails to run, you need to re-run the test from the beginning to verify that you fixed it. End-to-end tests is usually very slow compared to unit tests.
 
 prescript solves this problem by allowing you to express your tests as multiple, discrete steps.
 
-```
+```text
 Step 1. Open browser
 Step 2. Request password reset
 Step 2.1. Go to forgot password page
@@ -24,8 +23,7 @@ Step 8. Login with the new credentials
 Step 9. I should be in the workspace
 ```
 
-prescript comes with an __interactive development mode,__ in which you can __hot-reload the test script__ and __jump between steps.__ This means as you write your test, if you make a mistake you can fix it without having to re-run the whole test suite.
-
+prescript comes with an **interactive development mode,** in which you can **hot-reload the test script** and **jump between steps.** This means as you write your test, if you make a mistake you can fix it without having to re-run the whole test suite.
 
 ## Writing tests
 
@@ -40,9 +38,9 @@ const { test, to, action, defer, pending } = require('prescript')
 
 Use `test()` to define a test. Each test must have a unique name.
 
-Inside each test, use `action()` to queue an action to be run at runtime.
+When using `action()`, you should pass a function that returns a Promise \(async action\) or returns nothing \(sync action\).
 
-```js
+```javascript
 // Basic addition.js
 const { test, to, action } = require('prescript')
 const assert = require('assert')
@@ -66,7 +64,6 @@ test('Basic addition', () => {
   })
 })
 ```
-
 
 ### Nest steps to group related steps together
 
@@ -94,12 +91,11 @@ test('Basic addition', () => {
 })
 ```
 
-
 ### Use [page object pattern](http://martinfowler.com/bliki/PageObject.html) for more fluent and maintainable tests
 
 Upgrading to this pattern is very beneficial when there are many test cases that reuses the same logic. For Selenium-based tests, I recommend reading [_Selenium: 7 Things You Need To Know_](https://www.lucidchart.com/techblog/2015/07/21/selenium-7-things-you-need-to-know-2/).
 
-```js
+```javascript
 // Basic addition.js
 const { test } = require('prescript')
 const CalculatorTester = require('../test-lib/CalculatorTester')
@@ -113,7 +109,7 @@ Now our test is a single line!
 
 All the heavy lifting is in the CalculatorTester class:
 
-```js
+```javascript
 // CalculatorTester.js
 const { to, named, action } = require('../../..')
 const Calculator = require('../lib/Calculator')
@@ -152,19 +148,18 @@ module.exports = function CalculatorTester () {
 }
 ```
 
-
 ## Running a test
 
 To run a test in development mode:
 
 ```
-./node_modules/.bin/prescript tests/Filename.js ["Test name"] -d
+./node_modules/.bin/prescript tests/Filename.js "Test name" -d
 ```
 
 To run a test in non-interactive mode:
 
 ```
-./node_modules/.bin/prescript tests/Filename.js ["Test name"]
+./node_modules/.bin/prescript tests/Filename.js "Test name"
 ```
 
 **Test name** is optional if there is only one test. If a test file declares multiple test, you must explicitly specify the test name. You can list all tests using:
@@ -176,7 +171,7 @@ To run a test in non-interactive mode:
 
 ### Exit code
 
-_(Only applies to non-interactive mode)_
+_\(Only applies to non-interactive mode\)_
 
 | Exit Code | Description |
 | --------- | ----------- |
@@ -185,21 +180,17 @@ _(Only applies to non-interactive mode)_
 | 2         | Pending test |
 | 3         | Multiple tests defined |
 
-
 ### Running multiple tests
 
-prescript __by design__ only runs a single test.
-This allows prescript to remain a simple tool.
-Then you can implement your own test orchestrator to fit your project needs:
+prescript **by design** only runs a single test. This allows prescript to remain a simple tool. Then you can implement your own test orchestrator to fit your project needs:
 
-- Run only a subset of tests.
-- Run tests in parallel.
-- Randomize or specify the order of tests.
-- Retry failed tests.
-- Prepare environment variables before running tests.
+* Run only a subset of tests.
+* Run tests in parallel.
+* Randomize or specify the order of tests.
+* Retry failed tests.
+* Prepare environment variables before running tests.
 
-If prescript supported all of the above, it would make this micro-framework unnecessarily complex. Therefore, prescript encourages you to write your own test orchestrator. [It’s just a few lines of code!](./examples/testAll.js)
-
+If prescript supported all of the above, it would make this micro-framework unnecessarily complex. Therefore, prescript encourages you to write your own test orchestrator. [It’s just a few lines of code!](https://github.com/taskworld/prescript/tree/78c094874fc3ae54107003ec976d211c106c330d/examples/testAll.js)
 
 ## API
 
@@ -207,17 +198,13 @@ If prescript supported all of the above, it would make this micro-framework unne
 
 Defines a composite step.
 
-
 ### `action(name, async (state, context) => { ... })`
 
 Queue an action to be run. The function passed to `action()` will be called with these arguments:
 
-- __state__ - The state object. In the beginning of the test, it is empty. Add things to this object to persist state between steps and reloads.
-
-- __context__ - The context object contains:
-
-    - `log(...)` - Logs a message to the console. Use this instead of `console.log()` so that it doesn’t mess up console output.
-
+* **state** - The state object. In the beginning of the test, it is empty. Add things to this object to persist state between steps and reloads.
+* **context** - The context object contains:
+  * `log(...)` - Logs a message to the console. Use this instead of `console.log()` so that it doesn’t mess up console output.
 
 ### `defer(name, async (state, context) => { ... })`
 
@@ -236,7 +223,7 @@ defer('Quit browser', (state) => {
 })
 ```
 
-
 ### `pending()`
 
 Defines a pending step.
+
