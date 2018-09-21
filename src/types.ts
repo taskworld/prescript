@@ -1,5 +1,7 @@
 import { StepName } from './StepName'
 
+/// <reference path="./globalStateDeclaration.d.ts" />
+
 export type StepDefName = StepName | string
 
 export interface IStep {
@@ -89,6 +91,6 @@ export interface ITestIterator {
 }
 
 export type ActionFunction = (
-  state: any,
+  state: PrescriptGlobalState,
   context: ITestExecutionContext
 ) => void | Promise<any>
