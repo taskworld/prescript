@@ -39,9 +39,11 @@
   "scripts": {
     "lint": "eslint . --ext .ts,.js",
     "build": "tsc",
-    "prepublish": "npm run build",
+    "prepublish": "yarn build",
     "test": "jest",
-    "test-examples": "node examples/testAll.js"
+    "test-examples": "node examples/testAll.js",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "bin": {
     "prescript": "./bin/prescript"
