@@ -189,3 +189,11 @@ module.exports = function CalculatorTester() {
   return calculatorTester
 }
 ```
+
+::: tip THE `named` HELPER
+
+There’s a `named` helper that lets you generate a step name with variable
+interpolations. When displayed in test logs, the substituted variable will be
+differently colored.
+
+:::
