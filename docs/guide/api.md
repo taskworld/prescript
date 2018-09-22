@@ -6,6 +6,10 @@ Import `prescript` to access its APIs.
 const { test, to, action, defer, pending } = require('prescript')
 ```
 
+## `test(name, () => { ... })`
+
+Creates a **test.**
+
 ## `to(name, () => { ... })`
 
 Creates a **composite step.**
