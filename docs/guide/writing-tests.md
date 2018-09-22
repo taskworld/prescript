@@ -60,14 +60,25 @@ test('Sucessful password reset', () => {
     action('Enter the new password', async state => { ... })
     action('Submit the form', async state => { ... })
   })
-  step('Login with the new credentials', () => { ... })
-  step('I should be in the workspace', () => { ... })
+  action('Login with the new credentials', () => { ... })
+  action('I should be in the workspace', () => { ... })
 })
 ```
 <!-- prettier-ignore-end -->
 
 Since the test file is a JavaScript file, you can also generate actions
 indirectly (see the Page Object section down below for an example).
+
+## Execution phases
+
+When you run **prescript**, there are 2 phases that your code gets executed:
+
+* **Prescripting phase.** In this phase, your test code is executed to determine
+  what tests are available, including the steps in each test. This results in a
+  **test plan** being generated.
+
+* **Running phase.** In this phase, prescript executes the actions according to
+  the test plan generated from the previous phase.
 
 ## A basic test
 
@@ -193,7 +204,7 @@ module.exports = function CalculatorTester() {
 ::: tip THE `named` HELPER
 
 There’s a `named` helper that lets you generate a step name with variable
-interpolations. When displayed in test logs, the substituted variable will be
+interpolations. When displayed in test log, the substituted variable will be
 differently colored.
 
 :::

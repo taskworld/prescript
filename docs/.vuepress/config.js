@@ -13,7 +13,8 @@ module.exports = {
       '/guide/tutorial.md',
       '/guide/writing-tests.md',
       '/guide/running-a-test.md',
-      '/guide/api.md'
+      '/guide/api.md',
+      '/guide/tips.md'
     ]
   }
 }
