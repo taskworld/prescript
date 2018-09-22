@@ -142,8 +142,13 @@ test('Basic addition', () => {
 ## Use [page object pattern](http://martinfowler.com/bliki/PageObject.html) for more fluent and maintainable tests
 
 Upgrading to this pattern is very beneficial when there are many test cases that
-reuses the same logic. For Selenium-based tests, I recommend reading
-[_Selenium: 7 Things You Need To Know_](https://www.lucidchart.com/techblog/2015/07/21/selenium-7-things-you-need-to-know-2/).
+reuses the same logic.
+
+For more, I highly recommend reading
+[_Selenium: 7 Things You Need To Know_](https://www.lucidchart.com/techblog/2015/07/21/selenium-7-things-you-need-to-know-2/),
+even for people who don’t use Selenium. The article contains a lot of great tips
+for anyone who writes end-to-end tests. And these tips applies even if you’re
+using something else (e.g. Puppeteer, Appium, etc) to test your app.
 
 ```javascript
 // Basic addition.js
