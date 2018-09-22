@@ -133,11 +133,12 @@ have these components set up:
     [Allure Framework](https://docs.qameta.io/allure/).
 
 * **Test orchestrator.** You have many tests, but how do you run them? One by
-  one sequentially? In parallel in the same process? Separate processes?
-  Separate machines? On-demand auto-scaling cluster that runs tests? In which
-  order? If they fail, do you retry them? For how many times? Do you retry
-  immediately, or retry at the end of the test batch? That’s the job of the test
-  orchestrator — it determines which tests to run when.
+  one, sequentially? In parallel, on the same process? On separate processes? On
+  separate machines? On an on-demand auto-scaling cluster that runs tests in a
+  containerized environment? In which order? If they fail, do you retry them?
+  For how many times? Do you retry immediately, or retry at the end of the test
+  batch? Should tests be aborted if too many tests failed in a row? That’s the
+  job of the test orchestrator — it determines which tests to run when.
 
   * **prescript** doesn’t care. A prescript process only runs a single test
     once. That means you must write your own orchestrator.
@@ -145,4 +146,18 @@ have these components set up:
 Several testing frameworks, such as [Cypress](https://www.cypress.io/),
 [Codecept](https://codecept.io/) and [Nightwatch](http://nightwatchjs.org/)
 comes with all of them integrated in a single package, but **prescript** is just
-a test runner. This gives you more flexibility and separation of concerns.
+a test runner.
+
+* As of writing, [Cypress](https://www.cypress.io/) is known to provide one of
+  the best testing experiences for web apps, but it’s only for web apps. With
+  prescript, [our testing experience](./tutorial.md) can be used for anything
+  you may want to test.
+
+* There are so many ways to orchestrate tests (as illustrated above), and it
+  depends on use case, technology stack, and other constraints. Making prescript
+  support all of them would make it unnecessarily complex. By not doing any
+  orchestration, it reduces complexity (and maintenance burden) for us, and
+  gives flexibility for you.
+
+So, think of **prescript** as a building block you can use to create great
+testing experience!
