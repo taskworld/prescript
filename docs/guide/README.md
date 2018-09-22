@@ -70,7 +70,7 @@ to run tests in parallel on CircleCI.
 ::: tip
 
 Click on the link above that says ‘Allure Framework’ to witness the beauty of
-the the generated test reports!
+the generated test reports!
 
 :::
 
