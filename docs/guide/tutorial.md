@@ -7,7 +7,13 @@ Ready for a **prescript**ed experience? You’ll need:
 
 I assume you know how to use Node.js and Yarn.
 
-In this tutorial, we’re going to write a simple test using **prescript** and
+In this tutorial, we’ll learn:
+
+* How to create a test file.
+* How to use the **prescript interactive shell** to debug and fix a test file.
+* How to run the test and generate a report.
+
+We’re going to write a simple test using **prescript** and
 [Puppeteer](https://github.com/googlechrome/puppeteer/). It will go to
 `npmjs.com`, search for `prescript`, and verify that prescript is actually on
 npm.
@@ -82,7 +88,16 @@ prescript-tutorial
   }
   ```
 
-::: tip NOTE
+- The `test()` function declares a **test**. A test can contain multiple
+  **steps**.
+- The `action()` function declares an **action step**, which represents a test
+  action to be executed.
+- The `defer()` function declares a **deferred step**, which represents an
+  action to be performed at the end of the test (similar to
+  [Go’s defer statement](https://tour.golang.org/flowcontrol/12)), and is useful
+  for cleaning up and closing resources.
+
+::: tip THE `state` VARIABLE
 
 You may notice there’s a variable called `state`. You must put everything that’s
 shared between multiple steps in this variable.
@@ -114,7 +129,11 @@ Let’s see how it goes…
 
 ![Screenshot](./ouch.png)
 
-Oops! There’s an error…
+Oops, there’s an error!
+
+From the terminal output, we see that **the test failed at step 5** (‘Verify
+that the description is correct’)… This is one benefit of breaking your test
+into discrete steps — the tool can tell you exactly which step failed.
 
 It’s time to debug!
 
@@ -130,8 +149,8 @@ Now we can take a look at the browser:
 
 Hm… 🤔 what’s going on here???…………Oh! 😲 There it is! 💡
 
-In the ‘Search for prescript’ step, **we typed the search text but didn’t press
-Enter.** That’s why we stay at the same page...
+We found that in **step 4 (‘Search for prescript’), we typed the search text but
+didn’t press Enter.** That’s why we stay at the same page...
 
 <!-- prettier-ignore-start -->
 ```js {2}
@@ -140,6 +159,15 @@ Enter.** That’s why we stay at the same page...
   })
 ```
 <!-- prettier-ignore-end -->
+
+So, we can say that **the fault in step 4 caused the failure in step 5.**
+
+::: tip FAULT vs FAILURE
+
+**prescript** tells you which step caused the test to fail. But the **failure**
+may be caused by a **fault** in a prior step.
+
+:::
 
 ## Fixing the test
 
@@ -181,17 +209,29 @@ is made possible in prescript.
 
 :::
 
-## Fixing the test (again)
+## Resuming the test
 
-However, since the test failed on **step 5**, but the step that caused the
-failure is actually **step 4**, we need to jump to **step 4** first, before
-continuing on.
+When you **`reload`** your test, prescript will put you before the failed step.
+
+But as aforementioned, the fault in **step 4** caused the failure in **step 5**.
+That means to recover, we need to go back to **step 4** and continue from there.
 
 * Jump to step 4 by typing **`jump 4`** (or `j 4`) and press Enter.
 
 * Continue running the test by typing **`continue`** (or `c`) and press Enter.
 
+::: tip NOTE
+
+That’s why you need to break down your test into steps — this allows prescript
+to let you resume execution in the middle of your test.
+
+:::
+
+Let’s see how it goes…
+
 ![Screenshot](./ouch2.png)
+
+Waaa~
 
 It failed again!
 
@@ -199,38 +239,54 @@ Let’s look at the browser to see what happened...
 
 ![Screenshot](./what-happened2.png)
 
-Since we **retried** step 4, it got run twice.
-
-That means the word ‘prescript’ got typed into the search box twice!
+Now the search box contains the text ‘prescriptprescript’. Since we **retried**
+step 4, it got executed twice. That means the word ‘prescript’ got typed into
+the search box twice!
 
 ::: tip LESSON
 
-After reloading, make sure to revert the state continuing!
+When reloading or jumping, make sure to roll the state back before continuing!
 
 :::
 
+## Rolling the state back
+
 Ok, let’s try again.
 
+* Jump back to step 4 by typing **`jump 4`** (or `j 4`) and press Enter.
+
 * In the browser, manually delete the text in the search box. Also click the
-  Back button so that we are back to npm’s homepage.
-
-* Come back to **prescript interactive shell**.
-
-* Jump to step 4 by typing **`jump 4`** (or `j 4`) and press Enter.
+  Back button so that we are back to npm’s homepage. **This effectively brings
+  us to the known state before step 4 is executed**
 
 * Continue running the test by typing **`continue`** (or `c`) and press Enter.
 
 ![Screenshot](./ouch3.png)
 
-It failed again! But now it seems that the browser is showing the correct
-result.
+Ouch… It failed at **step 5** (‘Verify that the description is correct’) again!
 
-This is because after we press Enter, we didn’t wait for the search results to
-load. So it went ahead to the next step immediately.
+But this time, it seems that the browser is showing the correct result.
 
-::: tip LESSON
+This is because the step finished immediately after we press Enter. We didn’t
+wait for the search results to load. So it went ahead and verify the search
+result immediately. Of course, this would fail the test.
 
-Make sure each step verifies the outcome of its own action!
+## Fault containment
+
+As you can see, the **fault** in one step can cause a **failure** in subsequent
+step. To write tests that can be easily debugged, it’s important to follow the
+**fault containment principle**
+
+::: tip FAULT CONTAINMENT PRINCIPLE
+
+Make sure each step verifies the outcome of its own action.
+
+For example,
+
+* Step 1 (‘Go to npmjs.com’) should verify that `npmjs.com`’s home page is
+  indeed loaded.
+* Step 2 (‘Search for prescript’) should verify that the search result is
+  loaded.
 
 :::
 
@@ -251,7 +307,11 @@ Make sure each step verifies the outcome of its own action!
     })
   ```
 
-* Come back to **prescript interactive shell**, **`jump 4`**, and **`continue`**.
+## Seeing the test pass
+
+Hopefully, we’ve fixed everything by now.
+
+* In **prescript interactive shell**, **`reload`**, **`jump 4`**, and **`continue`**.
 
 <!-- prettier-ignore-end -->
 
@@ -261,11 +321,14 @@ Now, our test should pass ;)
 
 * Exit prescript by typing **`exit`** and press Enter.
 
-Now you understand how writing tests in prescript feels like.
+Now you can see how having an **interactive development mode** can help you
+debug a test failure with tighter feedback loop.
 
 ## Running the test in non-interactive mode
 
-In CI setting, you should run the test in non-interactive mode.
+Hopefully, you see the benefit of having an **interactive development mode.**
+But we also want to run tests as part of a continuous integration build process.
+That’s where should run the test in non-interactive mode.
 
 * Run the test in **non-interactive mode** using `yarn prescript <test-file>`:
 
@@ -273,12 +336,12 @@ In CI setting, you should run the test in non-interactive mode.
   yarn prescript tests/npm-search.js
   ```
 
-This will run the test to its completion, and exits with an error code if it
+This will run the test to its completion, or exits with an error code if the
 test failed. The prescript interactive shell is not available in this mode.
 
 ![Screenshot](./non-interactive.png)
 
-## Generating Allure reports
+## Generating Allure test reports
 
 As introduced in the previous page, prescript can generate a beautiful test
 report using Allure.
@@ -339,10 +402,20 @@ want to generate the test report and upload them for others to see.
   allure generate test-results
   ```
 
-A directory `allure-report` should pop up in your project directory.
+A directory `allure-report` should pop up in your project directory. You can
+then publish your generated `allure-report` and share with your colleague.
 
 ::: tip NOTE
 
 If you use Git, don’t forget to add `allure-report` to your `.gitignore`.
 
 :::
+
+## Conclusion
+
+* We learned how to write test in prescript using the `test`, `action`, and
+  `defer` APIs.
+* We learned how to use the **prescript interactive shell** to debug a test.
+* We learned how to run tests in **interactive development mode** and
+  **non-interactive mode**.
+* We learned how to generate an **test report** using Allure.
