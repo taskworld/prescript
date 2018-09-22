@@ -35,6 +35,40 @@ There are **4 types of steps**:
 * **Pending steps** marks the test as pending. Its behavior is equivalent to a
   failed action step. This is useful when your test is not complete.
 
+## Programming model
+
+We write our test in JavaScript. The above test can be represented in
+**prescript** as JavaScript code like this:
+
+<!-- prettier-ignore-start -->
+```js
+const { test, to, action, defer } = require('prescript')
+test('Sucessful password reset', () => {
+  action('Open browser', async state => { ... })
+  defer('Close browser', async state => { ... })
+  to('Request password reset', () => {
+    action('Go to forgot password page', async state => { ... })
+    action('Enter the email', async state => { ... })
+    action('Submit the form', async state => { ... })
+  })
+  to('Open the password reset link in email', () => {
+    action('Check the email', async state => { ... })
+    action('Open the reset password email', async state => { ... })
+    action('Click the reset password link in email', async state => { ... })
+  })
+  to('Reset password', () => {
+    action('Enter the new password', async state => { ... })
+    action('Submit the form', async state => { ... })
+  })
+  step('Login with the new credentials', () => { ... })
+  step('I should be in the workspace', () => { ... })
+})
+```
+<!-- prettier-ignore-end -->
+
+Since the test file is a JavaScript file, you can also generate actions
+indirectly (see the Page Object section down below for an example).
+
 ## A basic test
 
 Use `test()` to define a test. Each test must have a unique name.
@@ -112,9 +146,10 @@ test('Basic addition', () => {
 })
 ```
 
-Now our test is a single line!
+Now our test is much shorter.
 
-All the heavy lifting is in the CalculatorTester class:
+All the heavy lifting is now in the CalculatorTester class, which can be shared
+by many tests:
 
 ```javascript
 // CalculatorTester.js
