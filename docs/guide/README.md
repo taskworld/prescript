@@ -74,10 +74,11 @@ the the generated test reports!
 
 :::
 
-### We’ve been using it for 2 years in production
+### We’ve been using it for 2 years internally
 
 We at [Taskworld](https://taskworld.com/) developed prescript and have been
-using it for 2 years, so you may say it’s quite matured now.
+using it to test our production code for 2 years, so you may say it’s quite
+matured now.
 
 ### …but we don’t provide support… wait, this isn’t a feature?
 
