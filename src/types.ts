@@ -67,7 +67,16 @@ export interface ITestLoadLogger {
   test(name: StepName): void
 }
 
-export interface ITestExecutionContext {}
+export interface ITestExecutionContext {
+  /**
+   * This adds a log message to the current step.
+   * API is the same as `console.log()`.
+   * Use this function instead of `console.log()` to not clutter the console output.
+   * @param format Format string, like `console.log()`
+   * @param args Arguments to be formatted.
+   */
+  log(format: any, ...args: any[]): void
+}
 
 export interface IIterationListener {
   onEnter(node: IStep)

@@ -11,7 +11,12 @@ import isStepExist from './isStepExist'
 import createReporter from './createReporter'
 import prettyFormatStep from './prettyFormatStep'
 import createTestIterator from './createTestIterator'
-import { ITestIterator, IStep, ITestLoadLogger } from './types'
+import {
+  ITestIterator,
+  IStep,
+  ITestLoadLogger,
+  ITestExecutionContext
+} from './types'
 import { StepName } from './StepName'
 import { createConsoleLogger } from './loadTestModule'
 import { state } from './globalState'
@@ -330,7 +335,7 @@ async function runNext(
   const started = Date.now()
   const formatTimeTaken = () => chalk.dim(ms(Date.now() - started))
   const log: string[] = []
-  const context = {
+  const context: ITestExecutionContext = {
     log: (format, ...args) => {
       log.push(util.format(format, ...args))
     }
