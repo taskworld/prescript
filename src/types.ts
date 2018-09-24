@@ -102,4 +102,4 @@ export interface ITestIterator {
 export type ActionFunction = (
   state: PrescriptGlobalState,
   context: ITestExecutionContext
-) => void | Promise<any>
+) => void | PromiseLike<any>
