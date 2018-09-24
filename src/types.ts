@@ -1,6 +1,6 @@
-import { StepName } from './StepName'
+/// <reference path="./globalStateDeclaration.ts" />
 
-/// <reference path="./globalStateDeclaration.d.ts" />
+import { StepName } from './StepName'
 
 export type StepDefName = StepName | string
 

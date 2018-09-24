@@ -1,4 +1,4 @@
-/// <reference path="./globalStateDeclaration.d.ts" />
+/// <reference path="./globalStateDeclaration.ts" />
 
 export const state: PrescriptGlobalState = {}
 
