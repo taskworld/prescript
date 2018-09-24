@@ -33,7 +33,10 @@ There are **4 types of steps**:
   action steps.
 * **Composite steps** can contain child steps.
 * **Pending steps** marks the test as pending. Its behavior is equivalent to a
-  failed action step. This is useful when your test is not complete.
+  failed action step (that is, it aborts the tests and future steps are not
+  run). But instead of the test being marked as “FAILED” (exit code 1), it will
+  be marked as “PENDING” (exit code 2). This is useful when your test is not
+  complete, or when (temporarily) disabling a test.
 
 ## Programming model
 
