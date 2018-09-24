@@ -8,7 +8,8 @@
   "license": "MIT",
   "files": [
     "lib",
-    "bin"
+    "bin",
+    "cli.js"
   ],
   "dependencies": {
     "allure-js-commons": "^1.2.1",
