@@ -99,7 +99,14 @@ export interface ITestIterator {
   actionFailed(error: Error): void
 }
 
+interface Thenable {
+  then(
+    onFulfilled?: ((value: any) => any) | undefined | null,
+    onRejected?: ((reason: any) => any) | undefined | null
+  ): Thenable
+}
+
 export type ActionFunction = (
   state: PrescriptGlobalState,
   context: ITestExecutionContext
-) => void | PromiseLike<any>
+) => void | Thenable
