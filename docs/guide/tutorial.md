@@ -100,14 +100,15 @@ prescript-tutorial
 ::: tip THE `state` VARIABLE
 
 You may notice there’s a variable called `state`. You must put everything that’s
-shared between multiple steps in this variable.
+shared between steps in this variable.
 
-You may ask, “why don’t we just use local variables instead, i.e. putting
-`let browser` at the top of the file?” Well, you’ll see why soon… ;)
+**Do not create variables to hold the state of your tests.** You may ask, “why
+can’t we just use local variables, i.e. putting `let browser` at the top of the
+file?” Well, you’ll see why soon… ;)
 
 :::
 
-## Run the test in interactive mode
+## Run the test in development mode
 
 Now we have the test, let’s run it!
 
@@ -202,10 +203,12 @@ The test plan will be reloaded, but all your test state will remain intact.
 
 ::: tip NOTE
 
-That’s the reason why we need the `state` variable — it’s preserved across
-reloads! If we used a local variable, our new test code would not be able to
-access the variables defined in the previous test code. That’s how hot-reloading
-is made possible in prescript.
+That’s why we need to use prescript-provided `state` object — its contents are
+preserved across reloads! Had we used local variables (i.e. using
+`let browser, page` instead of `state.browser` and `state.page`), our
+newly-loaded test code wouldn’t be able to access the `browser` and `page`
+created in the previously-loaded test code, because it’s — well — local to it.
+That’s how hot-reloading is made possible in prescript.
 
 :::
 
@@ -214,7 +217,7 @@ is made possible in prescript.
 When you **`reload`** your test, prescript will put you before the failed step.
 
 But as aforementioned, the fault in **step 4** caused the failure in **step 5**.
-That means to recover, we need to go back to **step 4** and continue from there.
+That means to recover, we must go back to **step 4** and continue from there.
 
 * Jump to step 4 by typing **`jump 4`** (or `j 4`) and press Enter.
 
@@ -222,8 +225,9 @@ That means to recover, we need to go back to **step 4** and continue from there.
 
 ::: tip NOTE
 
-That’s why you need to break down your test into steps — this allows prescript
-to let you resume execution in the middle of your test.
+That’s why you need to break down your test into discrete steps — this allows
+prescript to take control of the way your test code is executed, thus letting
+you jump around and resume execution in the middle of your test.
 
 :::
 
@@ -231,7 +235,7 @@ Let’s see how it goes…
 
 ![Screenshot](./ouch2.png)
 
-Waaa~
+Waaaa—!
 
 It failed again!
 
@@ -239,9 +243,9 @@ Let’s look at the browser to see what happened...
 
 ![Screenshot](./what-happened2.png)
 
-Now the search box contains the text ‘prescriptprescript’. Since we **retried**
-step 4, it got executed twice. That means the word ‘prescript’ got typed into
-the search box twice!
+This time, the search box contains the text ‘prescriptprescript’. Since we
+**retried** step 4, it got executed twice. That means the word ‘prescript’ got
+typed into the search box twice!
 
 ::: tip LESSON
 
@@ -255,27 +259,28 @@ Ok, let’s try again.
 
 * Jump back to step 4 by typing **`jump 4`** (or `j 4`) and press Enter.
 
-* In the browser, manually delete the text in the search box. Also click the
+* **In the browser, manually delete the text in the search box.** Also click the
   Back button so that we are back to npm’s homepage. **This effectively brings
-  us to the known state before step 4 is executed**
+  us to the known state before step 4 is first executed.**
 
 * Continue running the test by typing **`continue`** (or `c`) and press Enter.
 
 ![Screenshot](./ouch3.png)
 
-Ouch… It failed at **step 5** (‘Verify that the description is correct’) again!
+Ouch… It failed again, at **step 5** (‘Verify that the description is correct’)!
 
 But this time, it seems that the browser is showing the correct result.
 
-This is because the step finished immediately after we press Enter. We didn’t
-wait for the search results to load. So it went ahead and verify the search
-result immediately. Of course, this would fail the test.
+This is because **step 4 finished immediately after we press Enter.** It didn’t
+wait for the search results to load or anything; it just hit Enter and moved on
+to **step 5** right away. So, **step 5** tried to verify the search result
+immediately, when it’s not available yet. Of course, this would fail the test.
 
 ## Fault containment
 
-As you can see, the **fault** in one step can cause a **failure** in subsequent
-step. To write tests that can be easily debugged, it’s important to follow the
-**fault containment principle**
+As you can see, a **fault** in one step can cause a **failure** in subsequent
+steps. This can lead to tests that are hard to debug. To write tests that can be
+easily debugged, it’s important to follow the **fault containment principle…**
 
 ::: tip FAULT CONTAINMENT PRINCIPLE
 
@@ -283,10 +288,10 @@ Make sure each step verifies the outcome of its own action.
 
 For example,
 
-* Step 1 (‘Go to npmjs.com’) should verify that `npmjs.com`’s home page is
-  indeed loaded.
-* Step 2 (‘Search for prescript’) should verify that the search result is
-  loaded.
+* Step 1 (‘Go to npmjs.com’) should wait for the web page to load, and verify
+  that `npmjs.com`’s home page is indeed displayed (instead of e.g. 502 pages).
+* Step 2 (‘Search for prescript’) should wait for the search results to load,
+  and verify that the search results are available before moving on.
 
 :::
 
@@ -309,7 +314,7 @@ For example,
 
 ## Seeing the test pass
 
-Hopefully, we’ve fixed everything by now.
+Hopefully, we’ve fixed everything now.
 
 * In **prescript interactive shell**, **`reload`**, **`jump 4`**, and **`continue`**.
 
@@ -322,13 +327,13 @@ Now, our test should pass ;)
 * Exit prescript by typing **`exit`** and press Enter.
 
 Now you can see how having an **interactive development mode** can help you
-debug a test failure with tighter feedback loop.
+debug a failed test with tighter feedback loop.
 
 ## Running the test in non-interactive mode
 
-Hopefully, you see the benefit of having an **interactive development mode.**
-But we also want to run tests as part of a continuous integration build process.
-That’s where should run the test in non-interactive mode.
+Having an **interactive development mode** at hand is great, but we also want to
+run our tests as part of a continuous integration build process. That’s where we
+should run the test in non-interactive mode.
 
 * Run the test in **non-interactive mode** using `yarn prescript <test-file>`:
 
@@ -365,8 +370,8 @@ report using Allure.
   yarn prescript tests/npm-search.js
   ```
 
-You should see a directory call **allure-results** created. Inside it you should
-see XML files.
+You should see a directory called **allure-results** created. Inside it, you
+should see XML files.
 
 ::: tip NOTE
 
@@ -379,7 +384,7 @@ If you use Git, don’t forget to add `allure-results` to your `.gitignore`.
 As you can see, **prescript** generates XML files to be used by Allure to
 generate a test report.
 
-* View the test report:
+* To view the test report:
 
   ```bash
   allure serve allure-results
@@ -396,7 +401,7 @@ Nice.
 The `allure serve` command lets you view the report in the browser. But you may
 want to generate the test report and upload them for others to see.
 
-* Generate the test report:
+* To generate the test report:
 
   ```bash
   allure generate test-results
@@ -419,3 +424,7 @@ If you use Git, don’t forget to add `allure-report` to your `.gitignore`.
 * We learned how to run tests in **interactive development mode** and
   **non-interactive mode**.
 * We learned how to generate an **test report** using Allure.
+
+The next section will dive into more details about writing tests in prescript.
+There, you will learn how to, for example, define **nested steps**, or use a
+page object pattern for a **cleaner test code.**

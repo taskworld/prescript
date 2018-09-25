@@ -46,7 +46,8 @@ simultaneously.
 
 **prescript** does not have a notion of ‘test suites’; the CLI only runs a
 single test. You need to write your own script in order to run multiple tests.
-This gives the users maximum flexibility in orchestrating the tests.
+This gives you complete control and thus maximum flexibility in orchestrating
+your tests.
 
 For simple projects, a simple shell script may suffice, i.e.
 `for I in tests/*.js; do yarn prescript "$I"; done`. For larger projects you can
@@ -155,10 +156,10 @@ a test runner.
   you may want to test.
 
 * There are so many ways to orchestrate tests (as illustrated above), and it
-  depends on use case, technology stack, and other constraints. Making prescript
-  support all of them would make it unnecessarily complex. By not doing any
-  orchestration, it reduces complexity (and maintenance burden) for us, and
-  gives flexibility for you.
+  depends on the use case, the technology stack, the scale, and other
+  constraints. Making prescript support all of them would make it unnecessarily
+  complex. By not doing any orchestration, it reduces complexity (and
+  maintenance burden) for us, and gives flexibility for you.
 
 So, think of **prescript** as a building block you can use to create great
 testing experience!
