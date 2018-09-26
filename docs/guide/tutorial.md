@@ -2,7 +2,7 @@
 
 Ready for a **prescript**ed experience? You’ll need:
 
-* [Node.js](https://nodejs.org/en/)
+* [Node.js](https://nodejs.org/en/) (at least version 8)
 * [Yarn](https://yarnpkg.com/en/) (make sure you have the latest version!)
 
 I assume you know how to use Node.js and Yarn.
