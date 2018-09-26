@@ -29,7 +29,7 @@ export interface ITestPrescriptionAPI {
    */
   test(
     nameParts: TemplateStringsArray,
-    ...substitutions: string[]
+    ...substitutions: any[]
   ): <X>(f: () => X) => X
 
   /**
@@ -41,7 +41,7 @@ export interface ITestPrescriptionAPI {
    */
   to(
     nameParts: TemplateStringsArray,
-    ...substitutions: string[]
+    ...substitutions: any[]
   ): <X>(f: () => X) => X
 
   /**
@@ -53,7 +53,7 @@ export interface ITestPrescriptionAPI {
    */
   action(
     nameParts: TemplateStringsArray,
-    ...substitutions: string[]
+    ...substitutions: any[]
   ): (f: ActionFunction) => void
   /**
    * Defines an action to be run at runtime.
@@ -69,7 +69,7 @@ export interface ITestPrescriptionAPI {
    */
   defer(
     nameParts: TemplateStringsArray,
-    ...substitutions: string[]
+    ...substitutions: any[]
   ): (f: ActionFunction) => void
 
   /**
