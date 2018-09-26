@@ -242,6 +242,33 @@ module.exports = class CalculatorTester {
 }
 ```
 
+::: warning
+
+Due to the way it’s written, our `CalculatorTester` currently hardcoded to work
+with `state.calculator`. That means it’s capable of working with only a single
+calculator, no matter how many `CalculatorTester` instances you create. This
+works fine if you are only testing 1 Calculator instance at the same time.
+
+However sometimes, you might have to test 2 things running simultaneously. For
+us at [Taskworld](https://taskworld.com), we build a collaborative realtime app.
+So, sometimes we need to run multiple instances of the browser at the same time,
+to verify that updates from A gets sent to browser B in real-time.
+
+For this, you can adjust your page object to receive the state key in which it
+will operate on.
+
+```js {3, 5}
+module.exports = class CalculatorTester {
+  constructor(stateKey = 'calculator') {
+    this._stateKey = stateKey
+    action('Initialize the calculator', state => {
+      state[this._stateKey] = new Calculator()
+    })
+  }
+```
+
+:::
+
 ::: tip THE TAGGED TEMPLATE LITERAL SYNTAX
 
 When creating steps that involves variables, you can use a
@@ -263,3 +290,46 @@ for the step you want.
 ![Screenshot](./tagged.png)
 
 :::
+
+## Pending steps
+
+Pending steps are quite useful. When a pending step is run, it marks the test as
+**pending.** When run in non-interactive mode, prescript will exit with code 2.
+
+### When developing tests
+
+When developing a new test, it’s useful to put `pending()` in the test, because:
+
+1.  This explicitly marks the test as **unfinished.**
+
+2.  When running in **development mode**, this causes the test to **pause**.
+    Otherwise, the deferred step (‘Close browser’) would be run right away,
+    closing the browser.
+
+```js {13}
+const puppeteer = require('puppeteer')
+const { test, action, defer, pending } = require('prescript')
+const assert = require('assert')
+
+test('A quest for "prescript" on npm', () => {
+  action('Open a web browser', async state => {
+    state.browser = await puppeteer.launch({ headless: false })
+    state.page = await state.browser.newPage()
+  })
+  defer('Close browser', async state => {
+    state.browser.close()
+  })
+  pending()
+})
+```
+
+### Temporarily disabling a test
+
+If some tests are getting in the way and you need to ship your stuff, you can
+promise to “fix it later” by calling `pending()` if a certain time isn’t
+reached.
+
+```js
+// I will fix it later, I promise!
+if (Date.now() < Date.parse('2018-10-01T10:00:00Z')) pending()
+```

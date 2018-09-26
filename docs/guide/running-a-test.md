@@ -1,4 +1,4 @@
-# Running a test
+# Running a test (CLI)
 
 ## Development mode
 

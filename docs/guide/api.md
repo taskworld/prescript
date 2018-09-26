@@ -6,15 +6,36 @@ Import `prescript` to access its APIs.
 const { test, to, action, defer, pending, named } = require('prescript')
 ```
 
-## `test(name, () => { ... })`
+## `test`
+
+<!-- prettier-ignore-start -->
+```js
+test('Test name', () => { /* Define steps here */ })
+test`Test name`(() => { /* Define steps here */ })
+```
+<!-- prettier-ignore-end -->
 
 Creates a **test.**
 
-## `to(name, () => { ... })`
+## `to`
+
+<!-- prettier-ignore-start -->
+```js
+to('Log in', () => { /* Define sub-steps here */ })
+to`Log in`(() => { /* Define sub-steps here */ })
+```
+<!-- prettier-ignore-end -->
 
 Creates a **composite step.**
 
 ## `action(name, async (state, context) => { ... })`
+
+<!-- prettier-ignore-start -->
+```js
+action('Fill in username', async (state, context) => { /* Action here */ })
+action`Fill in username`(async (state, context) => { /* Action here */ })
+```
+<!-- prettier-ignore-end -->
 
 Creates an **action step.** The function passed to `action()` will be called
 with these arguments:
@@ -26,9 +47,18 @@ with these arguments:
   * `log(...)` - Logs a message to the console. Use this instead of
     `console.log()` so that it doesn’t mess up console output.
 
-## `defer(name, async (state, context) => { ... })`
+## `defer`
+
+<!-- prettier-ignore-start -->
+```js
+defer('Close browser', async (state, context) => { /* Action here */ })
+defer`Close browser`(async (state, context) => { /* Action here */ })
+```
+<!-- prettier-ignore-end -->
 
 Creates a **deferred step** which queues an action to be run at the end of test.
+If the test reached this step, the action will be queued for running at the end,
+regardless of whether the test passed or not.
 
 A common pattern is to create a deferred step for closing the resource right
 after the action step that requested the resource.
@@ -46,5 +76,11 @@ defer('Quit browser', state => {
 ```
 
 ## `pending()`
+
+<!-- prettier-ignore-start -->
+```js
+pending()
+```
+<!-- prettier-ignore-end -->
 
 Defines a **pending step.**
