@@ -28,7 +28,7 @@ export interface ITestPrescriptionAPI {
    * Defines a compound test step.
    */
   test(
-    nameParts: string[],
+    nameParts: TemplateStringsArray,
     ...substitutions: string[]
   ): <X>(name: StepDefName, f: () => X) => X
 
@@ -40,7 +40,7 @@ export interface ITestPrescriptionAPI {
    * Defines a compound test step.
    */
   to(
-    nameParts: string[],
+    nameParts: TemplateStringsArray,
     ...substitutions: string[]
   ): <X>(name: StepDefName, f: () => X) => X
 
@@ -52,7 +52,7 @@ export interface ITestPrescriptionAPI {
    * Defines an action to be run at runtime.
    */
   action(
-    nameParts: string[],
+    nameParts: TemplateStringsArray,
     ...substitutions: string[]
   ): (f: ActionFunction) => void
   /**
@@ -68,7 +68,7 @@ export interface ITestPrescriptionAPI {
    * Defines a deferred action, e.g. for cleanup.
    */
   defer(
-    nameParts: string[],
+    nameParts: TemplateStringsArray,
     ...substitutions: string[]
   ): (f: ActionFunction) => void
 
