@@ -37,6 +37,9 @@ function main(args) {
   console.log()
 
   const dev = args.d || args['dev']
+  if (args['inspect']) {
+    require('inspector').open()
+  }
   if (dev) {
     runDevelopmentMode(testModulePath, requestedTestName)
   } else {
