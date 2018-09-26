@@ -30,7 +30,7 @@ export interface ITestPrescriptionAPI {
   test(
     nameParts: TemplateStringsArray,
     ...substitutions: string[]
-  ): <X>(name: StepDefName, f: () => X) => X
+  ): <X>(f: () => X) => X
 
   /**
    * Defines a compound test step.
@@ -42,7 +42,7 @@ export interface ITestPrescriptionAPI {
   to(
     nameParts: TemplateStringsArray,
     ...substitutions: string[]
-  ): <X>(name: StepDefName, f: () => X) => X
+  ): <X>(f: () => X) => X
 
   /**
    * Defines an action to be run at runtime.
