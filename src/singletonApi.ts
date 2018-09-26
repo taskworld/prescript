@@ -3,17 +3,17 @@ const { getInstance } = require('./singleton')
 import { named } from './StepName'
 
 const singletonPrescriptionApi: ITestPrescriptionAPI = {
-  test(name, f) {
-    return getInstance().test(name, f)
+  test(...args) {
+    return getInstance().test(...args)
   },
-  to(name, f) {
-    return getInstance().to(name, f)
+  to(...args) {
+    return getInstance().to(...args)
   },
   action(...args) {
     return getInstance().action(...args)
   },
-  defer(name, f) {
-    return getInstance().defer(name, f)
+  defer(...args) {
+    return getInstance().defer(...args)
   },
   pending() {
     return getInstance().pending()

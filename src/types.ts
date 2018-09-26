@@ -24,25 +24,53 @@ export interface ITestPrescriptionAPI {
    * Creates a test.
    */
   test<X>(name: StepDefName, f: () => X): X
+  /**
+   * Defines a compound test step.
+   */
+  test(
+    nameParts: string[],
+    ...substitutions: string[]
+  ): <X>(name: StepDefName, f: () => X) => X
 
   /**
    * Defines a compound test step.
    */
   to<X>(name: StepDefName, f: () => X): X
+  /**
+   * Defines a compound test step.
+   */
+  to(
+    nameParts: string[],
+    ...substitutions: string[]
+  ): <X>(name: StepDefName, f: () => X) => X
 
   /**
    * Defines an action to be run at runtime.
    */
-  action<X>(name: StepDefName, f: ActionFunction): void
+  action(name: StepDefName, f: ActionFunction): void
   /**
    * Defines an action to be run at runtime.
    */
-  action<X>(f: ActionFunction): void
+  action(
+    nameParts: string[],
+    ...substitutions: string[]
+  ): (f: ActionFunction) => void
+  /**
+   * Defines an action to be run at runtime.
+   */
+  action(f: ActionFunction): void
 
   /**
    * Defines a deferred action, e.g. for cleanup.
    */
-  defer<X>(name: StepDefName, f: ActionFunction): void
+  defer(name: StepDefName, f: ActionFunction): void
+  /**
+   * Defines a deferred action, e.g. for cleanup.
+   */
+  defer(
+    nameParts: string[],
+    ...substitutions: string[]
+  ): (f: ActionFunction) => void
 
   /**
    * Defines a pending action to make the test end with pending state.

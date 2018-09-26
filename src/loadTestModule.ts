@@ -118,50 +118,69 @@ function loadTest(
     return stackFrame.fileName + ':' + stackFrame.lineNumber
   }
 
+  function appendTest<X>(name: StepName.StepName, f: () => X): X {
+    if (currentTest && currentTest.root === implicitRoot) {
+      if (implicitRoot.children && implicitRoot.children.length) {
+        throw new Error('An implicit test has been started.')
+      }
+      currentTest = null
+      currentStep = null
+    }
+    if (currentTest) {
+      throw new Error('test() calls may not be nested.')
+    }
+    const nameStr = String(name)
+    if (usedTestNames[nameStr]) {
+      throw new Error(
+        `Test name must be unique. A test named "${nameStr}" has already been declared.`
+      )
+    }
+    usedTestNames[nameStr] = true
+    const root = (currentStep = {
+      name: name,
+      children: []
+    })
+    logger.test(name)
+    currentTest = createTest(root)
+    tests.push(root)
+    try {
+      const value = f()
+      finishTest()
+      return value
+    } finally {
+      currentStep = null
+      currentTest = null
+    }
+  }
+
+  function ensureDeprecatedAPIUsersDoNotUseTaggedTemplate(strings: any) {
+    if (Array.isArray(strings)) {
+      throw new Error(
+        'The old deprecated API does not support tagged template literal syntax.'
+      )
+    }
+  }
+
   const context: ITestPrescriptionContext = {
     step<X>(inName: StepDefName, f: () => X): X {
+      ensureDeprecatedAPIUsersDoNotUseTaggedTemplate(inName)
       const name = StepName.coerce(inName)
       const definition = getSource(
         ErrorStackParser.parse(new Error(`Step: ${name}`))
       )
       return appendStep({ name, definition }, f)
     },
-    test<X>(inName: StepDefName, f: () => X): X {
-      if (currentTest && currentTest.root === implicitRoot) {
-        if (implicitRoot.children && implicitRoot.children.length) {
-          throw new Error('An implicit test has been started.')
-        }
-        currentTest = null
-        currentStep = null
-      }
-      if (currentTest) {
-        throw new Error('test() calls may not be nested.')
-      }
-      const name = StepName.coerce(inName)
-      const nameStr = String(name)
-      if (usedTestNames[nameStr]) {
-        throw new Error(
-          `Test name must be unique. A test named "${nameStr}" has already been declared.`
-        )
-      }
-      usedTestNames[nameStr] = true
-      const root = (currentStep = {
-        name: name,
-        children: []
-      })
-      logger.test(name)
-      currentTest = createTest(root)
-      tests.push(root)
-      try {
-        const value = f()
-        finishTest()
-        return value
-      } finally {
-        currentStep = null
-        currentTest = null
+    test(...args: any[]): any {
+      if (Array.isArray(args[0])) {
+        const name = StepName.named(args[0], ...args.slice(1))
+        return <X>(f: () => X) => appendTest(name, f)
+      } else {
+        const name = StepName.coerce(args[0])
+        return appendTest(name, args[1])
       }
     },
     cleanup<X>(inName: StepDefName, f: () => X): X {
+      ensureDeprecatedAPIUsersDoNotUseTaggedTemplate(inName)
       const name = StepName.coerce(inName)
       const definition = getSource(
         ErrorStackParser.parse(new Error(`Cleanup step: ${name}`))
@@ -188,39 +207,70 @@ function loadTest(
     use<X>(m: (context: ITestPrescriptionContext) => X): X {
       return m(context)
     },
-    action<X>(arg0: StepDefName | ActionFunction, arg1?: ActionFunction): void {
-      if (!arg1) {
+    action<X>(...args: any[]): any {
+      if (!args[1]) {
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Action definition`))
         )
-        const f = arg0 as ActionFunction
+        const f = args[0] as ActionFunction
         return setAction(f, definition)
-      } else {
-        const name = StepName.coerce(arg0 as StepDefName)
-        const f = arg1 as ActionFunction
+      }
+      if (Array.isArray(args[0])) {
+        const name = StepName.named(args[0], ...args.slice(1))
         const definition = getSource(
-          ErrorStackParser.parse(new Error(`Action: ${name}`))
+          ErrorStackParser.parse(new Error(`Action Step: ${name}`))
+        )
+        return (f: ActionFunction) =>
+          appendStep({ name, definition }, () => {
+            return setAction(f, definition)
+          })
+      } else {
+        const name = StepName.coerce(args[0])
+        const f = args[1] as ActionFunction
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Action Step: ${name}`))
         )
         return appendStep({ name, definition }, () => {
           return setAction(f, definition)
         })
       }
     },
-    defer<X>(inName: StepDefName, f: ActionFunction) {
-      const name = StepName.coerce(inName)
-      const definition = getSource(
-        ErrorStackParser.parse(new Error(`Defer: {$name}`))
-      )
-      return appendStep({ name, definition, defer: true }, () => {
-        return setAction(f, definition)
-      })
+    defer(...args: any[]): any {
+      if (Array.isArray(args[0])) {
+        const name = StepName.named(args[0], ...args.slice(1))
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Deferred Action Step: ${name}`))
+        )
+        return (f: ActionFunction) =>
+          appendStep({ name, definition, defer: true }, () => {
+            return setAction(f, definition)
+          })
+      } else {
+        const name = StepName.coerce(args[0])
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Deferred Action Step: {$name}`))
+        )
+        const f = args[1] as ActionFunction
+        return appendStep({ name, definition, defer: true }, () => {
+          return setAction(f, definition)
+        })
+      }
     },
-    to<X>(inName: string, f: () => X): X {
-      const name = StepName.coerce(inName)
-      const definition = getSource(
-        ErrorStackParser.parse(new Error(`Step: ${name}`))
-      )
-      return appendStep({ name, definition }, f)
+    to(...args: any[]): any {
+      if (Array.isArray(args[0])) {
+        const name = StepName.named(args[0], ...args.slice(1))
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Composite Step: ${name}`))
+        )
+        return <X>(f: () => X) => appendStep({ name, definition }, f)
+      } else {
+        const name = StepName.coerce(args[0])
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Composite Step: ${name}`))
+        )
+        const f = args[1]
+        return appendStep({ name, definition }, f)
+      }
     },
     pending() {
       const error = new Error('[pending]')
