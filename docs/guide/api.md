@@ -3,7 +3,7 @@
 Import `prescript` to access its APIs.
 
 ```js
-const { test, to, action, defer, pending } = require('prescript')
+const { test, to, action, defer, pending, named } = require('prescript')
 ```
 
 ## `test(name, () => { ... })`

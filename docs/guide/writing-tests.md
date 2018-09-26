@@ -2,8 +2,8 @@
 
 ## Conceptual model
 
-In prescript, your “test” (scenario) is separated into multiple discrete
-“steps”.
+In prescript, your **“test”** (scenario) is separated into multiple discrete
+**“steps”.** This results in a **“test plan”** which looks like this:
 
 ```text
 Test: Sucessful password reset
@@ -76,12 +76,20 @@ indirectly (see the Page Object section down below for an example).
 
 When you run **prescript**, there are 2 phases that your code gets executed:
 
-* **Prescripting phase.** In this phase, your test code is executed to determine
-  what tests are available, including the steps in each test. This results in a
-  **test plan** being generated.
+* **Prescripting phase.** In this phase, your test code is first executed to
+  determine what tests are available, including the steps in each test. This
+  results in a **test plan** being generated. Code outside the `action()` and
+  `defer()` blocks are executed in this phase.
+
+  ::: warning
+
+  All the logic that’s executed during the prescripting phase **must be
+  deterministic** to allow the test code to be safely hot-reloaded.
+
+  :::
 
 * **Running phase.** In this phase, prescript executes the actions according to
-  the test plan generated from the previous phase.
+  the test plan generated from the prescripting phase.
 
 ## A basic test
 
@@ -153,66 +161,105 @@ even for people who don’t use Selenium. The article contains a lot of great ti
 for anyone who writes end-to-end tests. And these tips applies even if you’re
 using something else (e.g. Puppeteer, Appium, etc) to test your app.
 
+In this pattern, **instead of creating steps directly in our test code,** we
+write a library that creates the test steps for us.
+
+Here’s the previous test case, using the page object pattern.
+
 ```javascript
 // Basic addition.js
 const { test } = require('prescript')
 const CalculatorTester = require('../test-lib/CalculatorTester')
 
 test('Basic addition', () => {
-  CalculatorTester()
-    .add(50, 70)
-    .resultMustBe(120)
+  new CalculatorTester().add(50, 70).resultMustBe(120)
 })
 ```
 
-Now our test is much shorter.
-
-All the heavy lifting is now in the CalculatorTester class, which can be shared
-by many tests:
+**Now our test is much shorter.** All of our logic related to controlling the
+calculator is now centralized in `CalculatorTester`. This means
+`CalculatorTester` can be used from many tests, leading to a drier code.
 
 ```javascript
 // CalculatorTester.js
-const { to, named, action } = require('../../..')
+const { to, action } = require('prescript')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
-module.exports = function CalculatorTester() {
-  action('Initialize the calculator', state => {
-    state.calculator = new Calculator()
-  })
-  const calculatorTester = {
-    add(a, b) {
-      to(named`Calculate ${a} + ${b}`, () => {
-        enter(a)
-        enter(b)
-        pressAdd()
-      })
-      return calculatorTester
-    },
-    resultMustBe(n) {
-      action(named`Stored result must be ${n}`, state => {
-        assert.equal(state.calculator.result, n)
-      })
-    }
-  }
-  function enter(number) {
-    action(named`Enter ${number} into the calculator`, state => {
-      state.calculator.enter(number)
+module.exports = class CalculatorTester {
+  constructor() {
+    action('Initialize the calculator', state => {
+      state.calculator = new Calculator()
     })
   }
-  function pressAdd() {
+
+  /**
+   * Creates a step that makes the calculator add `a` and `b` together.
+   * @param {number} a
+   * @param {number} b
+   */
+  add(a, b) {
+    to`Calculate ${a} + ${b}`(() => {
+      this.enter(a)
+        .enter(b)
+        .pressAdd()
+    })
+    return this
+  }
+
+  /**
+   * Creates a step that asserts the state of the calculator.
+   * @param {number} n
+   */
+  resultMustBe(n) {
+    action`Stored result must be ${n}`(state => {
+      assert.equal(state.calculator.result, n)
+    })
+    return this
+  }
+
+  /**
+   * Creates a step that enters a number into the calculator.
+   * @param {number} number
+   */
+  enter(number) {
+    action`Enter ${number} into the calculator`(state => {
+      state.calculator.enter(number)
+    })
+    return this
+  }
+
+  /**
+   * Creates a step that presses the add button on the calculator.
+   * @param {number} number
+   */
+  pressAdd() {
     action('Press add', state => {
       state.calculator.add()
     })
+    return this
   }
-  return calculatorTester
 }
 ```
 
-::: tip THE `named` HELPER
+::: tip THE TAGGED TEMPLATE LITERAL SYNTAX
 
-There’s a `named` helper that lets you generate a step name with variable
-interpolations. When displayed in test log, the substituted variable will be
-differently colored.
+When creating steps that involves variables, you can use a
+[**tagged template literals**](http://exploringjs.com/es6/ch_template-literals.html)
+syntax, as can be seen in the example above:
+
+<!-- prettier-ignore-start -->
+```js
+    action`Stored result must be ${n}`(state => {
+      assert.equal(state.calculator.result, n)
+    })
+```
+<!-- prettier-ignore-end -->
+
+When run, the substitutions (`${n}`) will be color-coded. This is an indication
+that suggests you not to use the substituted text when search the source code
+for the step you want.
+
+![Screenshot](./tagged.png)
 
 :::

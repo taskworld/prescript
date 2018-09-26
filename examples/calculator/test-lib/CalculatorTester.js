@@ -1,4 +1,4 @@
-const { to, action, named } = require('../../..')
+const { to, action } = require('../../..')
 const Calculator = require('../lib/Calculator')
 const assert = require('assert')
 
