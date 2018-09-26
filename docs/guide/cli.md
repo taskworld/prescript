@@ -63,16 +63,17 @@ Exit codes only apply to non-interactive mode
 
 prescript **by design** only runs a single test. This allows prescript to remain
 a simple tool. You must implement your own test orchestrator to fit it to your
-project needs:
+project needs, which may include:
 
-* Run all tests.
-* Run only a subset of tests.
-* Run tests sequentially.
-* Run tests in parallel.
-* Distribute tests to be run on a cluster of test runner machines.
-* Randomize or specify the order of tests.
-* Retry failed tests.
-* Prepare environment variables before running tests.
+* Running all tests.
+* Running only a subset of tests.
+* Running tests sequentially.
+* Running tests in parallel.
+* Distributing tests to be run on a cluster of test runner machines.
+* Randomizing or specify the order of tests.
+* Retrying failed tests.
+* Aborting the test in case of too many failures.
+* Preparing environment variables before running tests.
 
 If prescript supported all of the above, it would make prescript unnecessarily
 complex. Therefore, prescript requires you to write your own test orchestrator.
