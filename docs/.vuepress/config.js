@@ -12,7 +12,7 @@ module.exports = {
       '/guide/',
       '/guide/tutorial.md',
       '/guide/writing-tests.md',
-      '/guide/running-a-test.md',
+      '/guide/cli.md',
       '/guide/api.md',
       '/guide/tips.md'
     ]
