@@ -358,7 +358,9 @@ async function runNext(
     showLog()
     tester.actionPassed()
   } catch (e) {
-    const definition = 'Action defined\n    at ' + step.actionDefinition
+    const definition =
+      'Hint: Here is where this action has been defined:\n    at ' +
+      step.actionDefinition
     if (e.__prescriptPending) {
       console.log('\b\b\b', chalk.bold.cyan('PENDING'), formatTimeTaken())
       console.log(
