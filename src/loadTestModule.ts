@@ -208,13 +208,6 @@ function loadTest(
       return m(context)
     },
     action<X>(...args: any[]): any {
-      if (!args[1]) {
-        const definition = getSource(
-          ErrorStackParser.parse(new Error(`Action definition`))
-        )
-        const f = args[0] as ActionFunction
-        return setAction(f, definition)
-      }
       if (Array.isArray(args[0])) {
         const name = StepName.named(args[0], ...args.slice(1))
         const definition = getSource(
@@ -224,6 +217,12 @@ function loadTest(
           appendStep({ name, definition }, () => {
             return setAction(f, definition)
           })
+      } else if (!args[1]) {
+        const definition = getSource(
+          ErrorStackParser.parse(new Error(`Action definition`))
+        )
+        const f = args[0] as ActionFunction
+        return setAction(f, definition)
       } else {
         const name = StepName.coerce(args[0])
         const f = args[1] as ActionFunction
