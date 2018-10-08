@@ -135,6 +135,6 @@ interface Thenable {
 }
 
 export type ActionFunction = (
-  state: PrescriptGlobalState,
+  state: Prescript.GlobalState,
   context: ITestExecutionContext
 ) => void | Thenable

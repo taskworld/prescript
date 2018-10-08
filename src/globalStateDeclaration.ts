@@ -1,3 +1,5 @@
-declare interface PrescriptGlobalState {
-  [key: string]: unknown
+declare namespace Prescript {
+  interface GlobalState {
+    [key: string]: unknown
+  }
 }
