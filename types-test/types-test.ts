@@ -1,5 +1,5 @@
-import * as singletonApi from './singletonApi'
-import { IPrescriptAPI } from './types'
+import * as singletonApi from '../src/singletonApi'
+import { IPrescriptAPI } from '../src/types'
 
 type PublicAPI = Pick<
   typeof singletonApi,

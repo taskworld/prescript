@@ -1,6 +1,12 @@
-/// <reference path="./globalStateDeclaration.ts" />
-
 import { StepName } from './StepName'
+
+declare global {
+  namespace Prescript {
+    interface GlobalState {
+      [key: string]: unknown
+    }
+  }
+}
 
 export type StepDefName = StepName | string
 

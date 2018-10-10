@@ -28,6 +28,7 @@ these steps:
     ```json
     {
       "compilerOptions": { "target": "ES6" },
+      "include": ["tests"],
       "exclude": ["node_modules", "**/node_modules/*"]
     }
     ```
@@ -36,18 +37,29 @@ these steps:
     the configuration file.
 
 2.  Create a file `state.d.ts` which will contain the type definition of your
-    state. Here’s an example:
+    state. It should declare an interface `GlobalState` in a global namespace
+    `Prescript`, thus triggering
+    [declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html).
+    Here’s an example:
 
     ```typescript
     import * as puppeteer from 'puppeteer'
 
-    declare namespace Prescript {
-      interface GlobalState {
-        browser: puppeteer.Browser
-        page: puppeteer.Page
+    declare global {
+      namespace Prescript {
+        interface GlobalState {
+          browser: puppeteer.Browser
+          page: puppeteer.Page
+        }
       }
     }
+
+    export {}
     ```
 
     Anything you add to the `GlobalState` interface inside `Prescript` namespace
     will show up in the type of the `state` variable.
+
+3.  Now you have IntelliSense for your test state!
+
+![Screenshot](./typing-complete.png)
