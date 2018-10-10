@@ -5,10 +5,10 @@ import ErrorStackParser from 'error-stack-parser'
 import prettyFormatStep from './prettyFormatStep'
 import {
   IStep,
-  ITestPrescriptionContext,
   ActionFunction,
   StepDefName,
-  ITestLoadLogger
+  ITestLoadLogger,
+  IPrescriptAPI
 } from './types'
 
 type StackTrace = ErrorStackParser.StackFrame[]
@@ -18,7 +18,7 @@ export interface ITestLoadOptions {
 }
 
 function loadTest(
-  testModule: (context: ITestPrescriptionContext) => void,
+  testModule: (context: IPrescriptAPI) => void,
   options: ITestLoadOptions = {}
 ): IStep[] {
   const { logger: inLogger = createConsoleLogger() } = options
@@ -161,7 +161,7 @@ function loadTest(
     }
   }
 
-  const context: ITestPrescriptionContext = {
+  const context: IPrescriptAPI = {
     step<X>(inName: StepDefName, f: () => X): X {
       ensureDeprecatedAPIUsersDoNotUseTaggedTemplate(inName)
       const name = StepName.coerce(inName)
@@ -204,7 +204,7 @@ function loadTest(
       const cause = currentStep.number
       currentTest.finishActions.push({ action: f, definition, cause })
     },
-    use<X>(m: (context: ITestPrescriptionContext) => X): X {
+    use<X>(m: (context: IPrescriptAPI) => X): X {
       return m(context)
     },
     action<X>(...args: any[]): any {

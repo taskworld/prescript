@@ -14,7 +14,8 @@ module.exports = {
       '/guide/writing-tests.md',
       '/guide/cli.md',
       '/guide/api.md',
-      '/guide/tips.md'
+      '/guide/tips.md',
+      '/guide/typings.md'
     ]
   }
 }

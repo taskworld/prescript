@@ -19,80 +19,48 @@ export interface IStep {
   defer?: boolean
 }
 
-export interface ITestPrescriptionAPI {
-  /**
-   * Creates a test.
-   */
-  test<X>(name: StepDefName, f: () => X): X
-  /**
-   * Defines a compound test step.
-   */
+export interface ITestLoadLogger {
+  step(step: IStep): void
+  test(name: StepName): void
+}
+
+// Note: Keep this interface in sync with `singletonApi.ts` exports!
+export interface IPrescriptAPI {
+  test<X>(name: string, f: () => X): X
   test(
     nameParts: TemplateStringsArray,
     ...substitutions: any[]
   ): <X>(f: () => X) => X
 
-  /**
-   * Defines a compound test step.
-   */
-  to<X>(name: StepDefName, f: () => X): X
-  /**
-   * Defines a compound test step.
-   */
+  to<X>(name: string, f: () => X): X
   to(
     nameParts: TemplateStringsArray,
     ...substitutions: any[]
   ): <X>(f: () => X) => X
 
-  /**
-   * Defines an action to be run at runtime.
-   */
-  action(name: StepDefName, f: ActionFunction): void
-  /**
-   * Defines an action to be run at runtime.
-   */
+  action(name: string, f: ActionFunction): void
   action(
     nameParts: TemplateStringsArray,
     ...substitutions: any[]
   ): (f: ActionFunction) => void
-  /**
-   * Defines an action to be run at runtime.
-   */
   action(f: ActionFunction): void
 
-  /**
-   * Defines a deferred action, e.g. for cleanup.
-   */
-  defer(name: StepDefName, f: ActionFunction): void
-  /**
-   * Defines a deferred action, e.g. for cleanup.
-   */
+  defer(name: string, f: ActionFunction): void
   defer(
     nameParts: TemplateStringsArray,
     ...substitutions: any[]
   ): (f: ActionFunction) => void
 
-  /**
-   * Defines a pending action to make the test end with pending state.
-   * Useful for unfinished tests.
-   */
   pending(): void
 
-  /** @deprecated Use `to()` instead. */
   step<X>(name: StepDefName, f: () => X): X
-  /** @deprecated Use `defer()` instead. */
+
   cleanup<X>(name: StepDefName, f: () => X): X
-  /** @deprecated Use `defer()` instead. */
+
   onFinish(f: () => void): void
-}
 
-export interface ITestPrescriptionContext extends ITestPrescriptionAPI {
-  use<X>(f: (context: ITestPrescriptionContext) => X): X
-}
-
-export interface ITestLoadLogger {
-  step(step: IStep): void
-  test(name: StepName): void
+  // This is only in IPrescriptAPI
+  use(f: (api: IPrescriptAPI) => void): void
 }
 
 export interface ITestExecutionContext {
