@@ -100,66 +100,74 @@ are welcome.
 I mean by that? Let’s say you want to test a web application. You’ll need to
 have these components set up:
 
-* **Browser automation library.** This allows you to programmatically control a
-  browser. Normally you would use
-  [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver) or
-  [puppeteer](https://www.npmjs.com/package/puppeteer).
+1.  **Browser automation library.** This allows you to programmatically control
+    a browser. Normally you would use
+    [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver) or
+    [puppeteer](https://www.npmjs.com/package/puppeteer).
 
-  * **prescript** doesn’t care. You can use any library you want. That means you
-    can also use prescript to test mobile apps, desktop apps, CLI tools, APIs,
-    or anything.
+        * **prescript** doesn’t care. You can use any library you want. That means you
+        can also use prescript to test mobile apps, desktop apps, CLI tools, APIs, or
+        anything.
 
-* **Test runner.** They provide a way to organize your test code and run it.
-  **prescript** is a test runner. Different test runners have different ways of
-  organizing your test code. For example:
+2.  **Test runner.** They provide a way to organize your test code and run it.
+    **prescript** is a test runner. Different test runners have different ways
+    of organizing your test code. For example:
 
-  * [mocha](https://www.npmjs.com/package/mocha) lets your organize tests into
-    “suites” and “tests”, using `describe` and `it` (or `suite` and `test`).
-  * [cucumber](https://cucumber.io/) lets you organize your “executable
-    specifications” into “features” and “scenarios” using the Gherkin syntax.
-  * **prescript** lets you organize your test code into “tests” and “steps.” A
-    step may contain sub-steps.
+    * [mocha](https://www.npmjs.com/package/mocha) lets your organize tests into
+      “suites” and “tests”, using `describe` and `it` (or `suite` and `test`).
+    * [cucumber](https://cucumber.io/) lets you organize your “executable
+      specifications” into “features” and “scenarios” using the Gherkin syntax.
+    * **prescript** lets you organize your test code into “tests” and “steps.” A
+      step may contain sub-steps.
 
-* **Assertion library.** These provides you with an API to make assertions. This
-  includes [Node.js’s `assert` module](https://nodejs.org/api/assert.html),
-  [Chai](http://chaijs.com/api/bdd/), etc. Some test tools, such as
-  [Jest](https://jestjs.io) provides its own built-in assertion library.
-  prescript doesn’t.
+3.  **Assertion library.** These provides you with an API to make assertions.
+    This includes
+    [Node.js’s `assert` module](https://nodejs.org/api/assert.html),
+    [Chai](http://chaijs.com/api/bdd/), etc. Some test tools, such as
+    [Jest](https://jestjs.io) provides its own built-in assertion library.
+    prescript doesn’t.
 
-  * **prescript** doesn’t care. You can use any library you want.
+    * **prescript** doesn’t care. You can use any library you want.
 
-* **Test reporter.** These components generate a beautiful test report for other
-  humans to see (or for other computer programs to further process).
+4.  **Test reporter.** These components generate a beautiful test report for
+    other humans to see (or for other computer programs to further process).
 
-  * **prescript** does not come with its own reporter, but it integrates with
-    [Allure Framework](https://docs.qameta.io/allure/).
+    * **prescript** does not come with its own reporter, but it integrates with
+      [Allure Framework](https://docs.qameta.io/allure/).
 
-* **Test orchestrator.** You have many tests, but how do you run them? One by
-  one, sequentially? In parallel, on the same process? On separate processes? On
-  separate machines? On an on-demand auto-scaling cluster that runs tests in a
-  containerized environment? In which order? If they fail, do you retry them?
-  For how many times? Do you retry immediately, or retry at the end of the test
-  batch? Should tests be aborted if too many tests failed in a row? That’s the
-  job of the test orchestrator — it determines which tests to run when.
+5.  **Test orchestrator.** You have many tests, but how do you run them? One by
+    one, sequentially? In parallel, on the same process? On separate processes?
+    On separate machines? On an on-demand auto-scaling cluster that runs tests
+    in a containerized environment? In which order? If they fail, do you retry
+    them? For how many times? Do you retry immediately, or retry at the end of
+    the test batch? Should tests be aborted if too many tests failed in a row?
+    That’s the job of the test orchestrator — it determines which tests to run
+    when.
 
-  * **prescript** doesn’t care. A prescript process only runs a single test
-    once. That means you must write your own orchestrator.
+    * **prescript** doesn’t care. A prescript process only runs a single test
+      once. That means you must write your own orchestrator.
 
 Several testing frameworks, such as [Cypress](https://www.cypress.io/),
 [Codecept](https://codecept.io/) and [Nightwatch](http://nightwatchjs.org/)
 comes with all of them integrated in a single package, but **prescript** is just
 a test runner.
 
-* As of writing, [Cypress](https://www.cypress.io/) is known to provide one of
-  the best testing experiences for web apps, but it’s only for web apps. With
-  prescript, [our testing experience](./tutorial.md) can be used for anything
-  you may want to test.
+So, why this extreme **modularity**?
 
-* There are so many ways to orchestrate tests (as illustrated above), and it
-  depends on the use case, the technology stack, the scale, and other
-  constraints. Making prescript support all of them would make it unnecessarily
-  complex. By not doing any orchestration, it reduces complexity (and
-  maintenance burden) for us, and gives flexibility for you.
+1.  Being modular allows you to use prescript to test anything. As of writing,
+    [Cypress](https://www.cypress.io/) is known to provide one of the best
+    testing experiences for web apps, but it’s only for web apps.
+
+    With prescript, [our testing experience](./tutorial.md) can be used for
+    anything you may want to test.
+
+2.  Different projects have different test orchestration needs (as illustrated
+    above), and it depends on the use case, the technology stack, the scale, and
+    other constraints.
+
+    Making prescript support all of them would make it unnecessarily complex. By
+    not doing any orchestration, it reduces complexity (and maintenance burden)
+    for us, and gives flexibility for you.
 
 So, think of **prescript** as a building block you can use to create great
 testing experience!

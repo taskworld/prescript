@@ -9,9 +9,9 @@ I assume you know how to use Node.js and Yarn.
 
 In this tutorial, we’ll learn:
 
-* How to create a test file.
-* How to use the **prescript interactive shell** to debug and fix a test file.
-* How to run the test and generate a report.
+1.  How to create a test file.
+2.  How to use the **prescript interactive shell** to debug and fix a test file.
+3.  How to run the test and generate a report.
 
 We’re going to write a simple test using **prescript** and
 [Puppeteer](https://github.com/googlechrome/puppeteer/). It will go to
@@ -418,12 +418,15 @@ If you use Git, don’t forget to add `allure-report` to your `.gitignore`.
 
 ## Conclusion
 
-* We learned how to write test in prescript using the `test`, `action`, and
-  `defer` APIs.
-* We learned how to use the **prescript interactive shell** to debug a test.
-* We learned how to run tests in **interactive development mode** and
-  **non-interactive mode**.
-* We learned how to generate an **test report** using Allure.
+1.  We learned how to write test in prescript using the `test`, `action`, and
+    `defer` APIs.
+
+2.  We learned how to use the **prescript interactive shell** to debug a test.
+
+3.  We learned how to run tests in **interactive development mode** and
+    **non-interactive mode**.
+
+4.  We learned how to generate an **test report** using Allure.
 
 The next section will dive into more details about writing tests in prescript.
 There, you will learn how to, for example, define **nested steps**, or use a

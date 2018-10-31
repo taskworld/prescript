@@ -26,17 +26,21 @@ Test: Sucessful password reset
 
 There are **4 types of steps**:
 
-* **Action steps** performs some kind of action. If an action fail, all
-  subsequent steps will be aborted.
-* **Deferred steps** queues an action to be run at the end of the test. It will
-  be run when the test is completed or terminated due to an error in one of the
-  action steps.
-* **Composite steps** can contain child steps.
-* **Pending steps** marks the test as pending. Its behavior is equivalent to a
-  failed action step (that is, it aborts the tests and future steps are not
-  run). But instead of the test being marked as “FAILED” (exit code 1), it will
-  be marked as “PENDING” (exit code 2). This is useful when your test is not
-  complete, or when (temporarily) disabling a test.
+1.  **Action steps** performs some kind of action. If an action fail, all
+    subsequent steps will be aborted.
+
+2.  **Deferred steps** queues an action to be run at the end of the test. It
+    will be run when the test is completed or terminated due to an error in one
+    of the action steps.
+
+3.  **Composite steps** allows you to group steps together, creating a hierarchy
+    of steps.
+
+4.  **Pending steps** marks the test as pending. Its behavior is equivalent to a
+    failed action step (that is, it aborts the tests and future steps are not
+    run). But instead of the test being marked as “FAILED” (exit code 1), it
+    will be marked as “PENDING” (exit code 2). This is useful when your test is
+    not complete, or when (temporarily) disabling a test.
 
 ## Programming model
 
