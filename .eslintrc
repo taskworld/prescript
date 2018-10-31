@@ -1,0 +1,16 @@
+parser: typescript-eslint-parser
+parserOptions:
+  ecmaVersion: 2017
+  sourceType: module
+plugins:
+  - prettier
+extends:
+  - eslint:recommended
+  - plugin:prettier/recommended
+env:
+  node: true
+rules:
+  no-console: off
+  # Let TypeScript compiler check for these!
+  no-undef: off
+  no-unused-vars: off

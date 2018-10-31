@@ -1,2 +1,5 @@
+const { test } = require('../../..')
 const CalculatorTester = require('../test-lib/CalculatorTester')
-CalculatorTester().add(50, 70).resultMustBe(120)
+test('Basic addition', () => {
+  new CalculatorTester().add(50, 70).resultMustBe(120)
+})
