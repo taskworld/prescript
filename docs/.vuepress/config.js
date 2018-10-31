@@ -9,13 +9,25 @@ module.exports = {
       { text: 'GitHub', link: 'https://github.com/taskworld/prescript' }
     ],
     sidebar: [
-      '/guide/',
-      '/guide/tutorial.md',
-      '/guide/writing-tests.md',
-      '/guide/cli.md',
-      '/guide/api.md',
-      '/guide/tips.md',
-      '/guide/typings.md'
+      {
+        title: 'User guide',
+        collapsable: false,
+        children: [
+          '/guide/',
+          '/guide/tutorial.md',
+          '/guide/writing-tests.md',
+          '/guide/cli.md',
+          '/guide/api.md',
+          '/guide/tips.md'
+        ]
+      },
+      {
+        title: 'More topics',
+        collapsable: false,
+        children: [
+          '/guide/typings.md'
+        ]
+      }
     ]
   }
 }
