@@ -20,9 +20,15 @@ import {
 import { StepName } from './StepName'
 import { createConsoleLogger } from './loadTestModule'
 import { state } from './globalState'
+import cosmiconfig from 'cosmiconfig'
+import { resolveConfig, ResolvedConfig } from './configuration'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
+  const result = cosmiconfig('prescript').searchSync(
+    path.dirname(testModulePath)
+  )
+  const config = resolveConfig((result && result.config) || {})
   const requestedTestName = args._[1] || null
 
   if (args.l || args['list']) {
@@ -41,9 +47,9 @@ function main(args) {
     require('inspector').open()
   }
   if (dev) {
-    runDevelopmentMode(testModulePath, requestedTestName)
+    runDevelopmentMode(testModulePath, requestedTestName, config)
   } else {
-    runNonInteractiveMode(testModulePath, requestedTestName)
+    runNonInteractiveMode(testModulePath, requestedTestName, config)
   }
 }
 
@@ -91,7 +97,8 @@ function listTests(testModulePath: string, options: { json: boolean }) {
 
 function runDevelopmentMode(
   testModulePath: string,
-  requestedTestName: string | null
+  requestedTestName: string | null,
+  config: ResolvedConfig
 ) {
   const tester: ITestIterator = createTestIterator(createLogVisitor())
   const ui = createUI()
@@ -215,7 +222,7 @@ function runDevelopmentMode(
   async function runNextStep() {
     let error
     const stepNumber = tester.getCurrentStepNumber()
-    await runNext(tester, state, e => {
+    await runNext(tester, config, state, e => {
       error = e
     })
     previousResult = { stepNumber, error }
@@ -241,7 +248,8 @@ function createFilteredLogger(
 
 function runNonInteractiveMode(
   testModulePath: string,
-  requestedTestName: string | null
+  requestedTestName: string | null,
+  config: ResolvedConfig
 ) {
   console.log(chalk.bold.yellow('## Generating test plan...'))
   const tests = singleton
@@ -286,7 +294,7 @@ function runNonInteractiveMode(
     tester.setTest(tests[0])
     tester.begin()
     while (!tester.isDone()) {
-      await runNext(tester, state, e => errors.push(e))
+      await runNext(tester, config, state, e => errors.push(e))
     }
     reporter.onFinish(errors)
     const timeTaken = Date.now() - started
@@ -324,6 +332,7 @@ function createLogVisitor() {
 
 async function runNext(
   tester: ITestIterator,
+  config: ResolvedConfig,
   state,
   onError: (e: Error) => void
 ) {
@@ -347,7 +356,13 @@ async function runNext(
     if (!step || !step.action) {
       throw new Error('Internal error: No step to run.')
     }
-    const promise = step.action(state, context)
+    const action = step.action
+    const promise = config.wrapAction(
+      step,
+      async () => action(state, context),
+      state,
+      context
+    )
     if (
       (promise && typeof promise.then !== 'function') ||
       (!promise && promise !== undefined)

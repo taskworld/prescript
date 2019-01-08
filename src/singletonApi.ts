@@ -1,4 +1,5 @@
 import { ActionFunction, StepDefName } from './types'
+export { IConfig } from './types'
 const { getInstance } = require('./singleton')
 
 /**

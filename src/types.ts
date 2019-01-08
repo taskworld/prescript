@@ -10,6 +10,17 @@ declare global {
 
 export type StepDefName = StepName | string
 
+export interface IConfig {
+  wrapAction?: ActionWrapper
+}
+
+export type ActionWrapper = (
+  step: IStep,
+  execute: () => Promise<void>,
+  state: Prescript.GlobalState,
+  context: ITestExecutionContext
+) => Promise<void>
+
 export interface IStep {
   name: StepName
   number?: string

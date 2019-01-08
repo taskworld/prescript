@@ -12,9 +12,11 @@
     "cli.js"
   ],
   "dependencies": {
+    "@types/cosmiconfig": "^5.0.3",
     "allure-js-commons": "^1.2.1",
     "chalk": "^2.4.1",
     "co": "^4.6.0",
+    "cosmiconfig": "^5.0.7",
     "error-stack-parser": "^2.0.1",
     "indent-string": "^3.0.0",
     "invariant": "^2.2.2",
