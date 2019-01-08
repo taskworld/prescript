@@ -18,15 +18,14 @@ module.exports = {
           '/guide/writing-tests.md',
           '/guide/cli.md',
           '/guide/api.md',
+          '/guide/config.md',
           '/guide/tips.md'
         ]
       },
       {
         title: 'More topics',
         collapsable: false,
-        children: [
-          '/guide/typings.md'
-        ]
+        children: ['/guide/typings.md']
       }
     ]
   }
