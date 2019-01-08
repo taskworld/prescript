@@ -89,6 +89,14 @@ export interface ITestExecutionContext {
    * @param args Arguments to be formatted.
    */
   log(format: any, ...args: any[]): void
+
+  /**
+   * This adds an attachment to the current step, such as screenshot, JSON result, etc.
+   * @param name Name of the attachment
+   * @param buffer Attachment content
+   * @param mimeType MIME type of the attachment (image/jpeg, text/plain, application/json...)
+   */
+  attach(name: string, buffer: Buffer, mimeType: string): void
 }
 
 export interface IIterationListener {

@@ -46,6 +46,9 @@ with these arguments:
 * **context** - The context object contains:
   * `log(...)` - Logs a message to the console. Use this instead of
     `console.log()` so that it doesn’t mess up console output.
+  * `attachment(name, buffer, mimeType)` — Attachs some binary output. For
+    example, screenshots, raw API response. This will get written to the Allure
+    report.
 
 ## `defer`
 

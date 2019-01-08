@@ -1,4 +1,5 @@
 import path from 'path'
+import singletonAllureInstance from './singletonAllureInstance'
 
 export default function createReporter(testModulePath, rootStepName) {
   if (
@@ -23,6 +24,7 @@ export default function createReporter(testModulePath, rootStepName) {
   }
   allure.startSuite(suiteName)
   allure.startCase(caseName)
+  singletonAllureInstance.currentInstance = allure
   return {
     iterationListener: {
       onEnter(node) {

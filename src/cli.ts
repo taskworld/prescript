@@ -22,6 +22,7 @@ import { createConsoleLogger } from './loadTestModule'
 import { state } from './globalState'
 import cosmiconfig from 'cosmiconfig'
 import { resolveConfig, ResolvedConfig } from './configuration'
+import singletonAllureInstance from './singletonAllureInstance'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
@@ -346,10 +347,26 @@ async function runNext(
   )
   const started = Date.now()
   const formatTimeTaken = () => chalk.dim(ms(Date.now() - started))
-  const log: string[] = []
+  const log: { text: string; timestamp: number }[] = []
   const context: ITestExecutionContext = {
     log: (format, ...args) => {
-      log.push(util.format(format, ...args))
+      log.push({
+        text: util.format(format, ...args),
+        timestamp: Date.now()
+      })
+    },
+    attach: (name, buffer, mimeType) => {
+      const allure = singletonAllureInstance.currentInstance
+      const buf = Buffer.from(buffer)
+      if (allure) {
+        allure.addAttachment(name, buf, mimeType)
+      }
+      context.log(
+        'Attachment added: "%s" (%s, %s bytes)',
+        name,
+        mimeType,
+        buf.length
+      )
     }
   }
   try {
@@ -373,7 +390,7 @@ async function runNext(
     }
     await Promise.resolve(promise)
     console.log('\b\b\b', chalk.bold.green('OK'), formatTimeTaken())
-    showLog()
+    flushLog()
     tester.actionPassed()
   } catch (e) {
     const definition =
@@ -393,16 +410,35 @@ async function runNext(
       console.log('\b\b\b', chalk.bold.red('NG'), formatTimeTaken())
       console.log(chalk.red(indentString(e.stack + '\n' + definition, indent)))
     }
-    showLog()
+    flushLog()
     onError(e)
     tester.actionFailed(e)
   }
 
-  function showLog() {
+  function flushLog() {
     for (const item of log) {
       const logText =
-        chalk.dim('* ') + chalk.cyan(indentString(item, 2).substr(2))
+        chalk.dim('* ') + chalk.cyan(indentString(item.text, 2).substr(2))
       console.log(indentString(logText, indent))
+    }
+    const allure = singletonAllureInstance.currentInstance
+    if (allure) {
+      if (log.length > 0) {
+        const logText = log
+          .map(item => {
+            const prefix = `[${new Date(item.timestamp).toJSON()}] `
+            return (
+              prefix +
+              indentString(item.text, prefix.length).substr(prefix.length)
+            )
+          })
+          .join('\n')
+        allure.addAttachment(
+          'Action log',
+          Buffer.from(logText, 'utf8'),
+          'text/plain'
+        )
+      }
     }
   }
 }
