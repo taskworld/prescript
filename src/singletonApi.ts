@@ -1,4 +1,5 @@
 import { ActionFunction, StepDefName } from './types'
+import currentActionContext from './currentActionContext'
 export { IConfig } from './types'
 const { getInstance } = require('./singleton')
 
@@ -120,6 +121,28 @@ export function onFinish(...args) {
   return getInstance().onFinish(...args)
 }
 
+/**
+ * Returns the current state object.
+ * This allows library functions to hook into prescript’s state.
+ */
+export function getCurrentState() {
+  if (!currentActionContext.current) {
+    throw new Error('getCurrentState() must be called inside an action.')
+  }
+  return currentActionContext.current.state
+}
+
+/**
+ * Returns the current action context object.
+ * This allows library functions to hook into prescript’s current action context.
+ */
+export function getCurrentContext() {
+  if (!currentActionContext.current) {
+    throw new Error('getCurrentContext() must be called inside an action.')
+  }
+  return currentActionContext.current.context
+}
+
 export default {
   test,
   to,
@@ -128,5 +151,7 @@ export default {
   pending,
   step,
   cleanup,
-  onFinish
+  onFinish,
+  getCurrentState,
+  getCurrentContext
 }

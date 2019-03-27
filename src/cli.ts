@@ -23,6 +23,7 @@ import { state } from './globalState'
 import cosmiconfig from 'cosmiconfig'
 import { resolveConfig, ResolvedConfig } from './configuration'
 import singletonAllureInstance from './singletonAllureInstance'
+import currentActionContext from './currentActionContext'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
@@ -369,6 +370,7 @@ async function runNext(
       )
     }
   }
+  currentActionContext.current = { state, context }
   try {
     if (!step || !step.action) {
       throw new Error('Internal error: No step to run.')
@@ -413,6 +415,8 @@ async function runNext(
     flushLog()
     onError(e)
     tester.actionFailed(e)
+  } finally {
+    currentActionContext.current = null
   }
 
   function flushLog() {
