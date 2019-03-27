@@ -87,3 +87,23 @@ pending()
 <!-- prettier-ignore-end -->
 
 Defines a **pending step.**
+
+## `getCurrentState()`
+
+Returns the current test state object. This method allows library functions to
+access the current state without requiring user to pass the `state` object all
+the way from the action.
+
+This can make writing tests more convenient, but treat this like a global
+variable — it introduces an _implicit_ runtime dependency from the caller to
+prescript’s internal state.
+
+## `getCurrentContext()`
+
+Returns the current test state object. This method allows library functions to
+access functions such as `context.log()` and `context.attachment()` without
+requiring users to pass the `state` object all the way from the action.
+
+This can make writing tests more convenient, but treat this like a global
+variable — it introduces an _implicit_ runtime dependency from the caller to
+prescript’s internal state.
