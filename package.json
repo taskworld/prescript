@@ -1,6 +1,6 @@
 {
   "name": "prescript",
-  "version": "0.55555.5-5",
+  "version": "0.55555.5-55",
   "description": "Object-oriented acceptance test tool",
   "main": "./lib/singletonApi.js",
   "typings": "./lib/singletonApi.d.ts",
