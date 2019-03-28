@@ -5,6 +5,9 @@ declare global {
     interface GlobalState {
       [key: string]: unknown
     }
+    interface PrescriptionState {
+      [key: string]: unknown
+    }
   }
 }
 

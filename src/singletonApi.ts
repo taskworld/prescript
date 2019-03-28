@@ -121,6 +121,8 @@ export function onFinish(...args) {
   return getInstance().onFinish(...args)
 }
 
+// The advanced API zone!
+
 /**
  * Returns the current state object.
  * This allows library functions to hook into prescript’s state.
@@ -143,6 +145,20 @@ export function getCurrentContext() {
   return currentActionContext.current.context
 }
 
+const stateCache = new WeakMap<any, Prescript.PrescriptionState>()
+
+/**
+ * Returns a state object that exists only during prescription phase for each test.
+ * This is useful for libraries to implement, e.g.
+ */
+export function getCurrentPrescriptionState() {
+  const instance = getInstance()
+  if (stateCache.has(instance)) return stateCache.get(instance)!
+  const state: Prescript.PrescriptionState = {}
+  stateCache.set(instance, state)
+  return state
+}
+
 export default {
   test,
   to,
@@ -153,5 +169,6 @@ export default {
   cleanup,
   onFinish,
   getCurrentState,
-  getCurrentContext
+  getCurrentContext,
+  getCurrentPrescriptionState
 }
