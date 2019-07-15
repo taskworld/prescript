@@ -20,9 +20,17 @@ import {
 import { StepName } from './StepName'
 import { createConsoleLogger } from './loadTestModule'
 import { state } from './globalState'
+import cosmiconfig from 'cosmiconfig'
+import { resolveConfig, ResolvedConfig } from './configuration'
+import singletonAllureInstance from './singletonAllureInstance'
+import currentActionContext from './currentActionContext'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
+  const result = cosmiconfig('prescript').searchSync(
+    path.dirname(testModulePath)
+  )
+  const config = resolveConfig((result && result.config) || {})
   const requestedTestName = args._[1] || null
 
   if (args.l || args['list']) {
@@ -41,9 +49,9 @@ function main(args) {
     require('inspector').open()
   }
   if (dev) {
-    runDevelopmentMode(testModulePath, requestedTestName)
+    runDevelopmentMode(testModulePath, requestedTestName, config)
   } else {
-    runNonInteractiveMode(testModulePath, requestedTestName)
+    runNonInteractiveMode(testModulePath, requestedTestName, config)
   }
 }
 
@@ -91,7 +99,8 @@ function listTests(testModulePath: string, options: { json: boolean }) {
 
 function runDevelopmentMode(
   testModulePath: string,
-  requestedTestName: string | null
+  requestedTestName: string | null,
+  config: ResolvedConfig
 ) {
   const tester: ITestIterator = createTestIterator(createLogVisitor())
   const ui = createUI()
@@ -215,7 +224,7 @@ function runDevelopmentMode(
   async function runNextStep() {
     let error
     const stepNumber = tester.getCurrentStepNumber()
-    await runNext(tester, state, e => {
+    await runNext(tester, config, state, e => {
       error = e
     })
     previousResult = { stepNumber, error }
@@ -241,7 +250,8 @@ function createFilteredLogger(
 
 function runNonInteractiveMode(
   testModulePath: string,
-  requestedTestName: string | null
+  requestedTestName: string | null,
+  config: ResolvedConfig
 ) {
   console.log(chalk.bold.yellow('## Generating test plan...'))
   const tests = singleton
@@ -286,7 +296,7 @@ function runNonInteractiveMode(
     tester.setTest(tests[0])
     tester.begin()
     while (!tester.isDone()) {
-      await runNext(tester, state, e => errors.push(e))
+      await runNext(tester, config, state, e => errors.push(e))
     }
     reporter.onFinish(errors)
     const timeTaken = Date.now() - started
@@ -324,6 +334,7 @@ function createLogVisitor() {
 
 async function runNext(
   tester: ITestIterator,
+  config: ResolvedConfig,
   state,
   onError: (e: Error) => void
 ) {
@@ -337,17 +348,40 @@ async function runNext(
   )
   const started = Date.now()
   const formatTimeTaken = () => chalk.dim(ms(Date.now() - started))
-  const log: string[] = []
+  const log: { text: string; timestamp: number }[] = []
   const context: ITestExecutionContext = {
     log: (format, ...args) => {
-      log.push(util.format(format, ...args))
+      log.push({
+        text: util.format(format, ...args),
+        timestamp: Date.now()
+      })
+    },
+    attach: (name, buffer, mimeType) => {
+      const allure = singletonAllureInstance.currentInstance
+      const buf = Buffer.from(buffer)
+      if (allure) {
+        allure.addAttachment(name, buf, mimeType)
+      }
+      context.log(
+        'Attachment added: "%s" (%s, %s bytes)',
+        name,
+        mimeType,
+        buf.length
+      )
     }
   }
+  currentActionContext.current = { state, context }
   try {
     if (!step || !step.action) {
       throw new Error('Internal error: No step to run.')
     }
-    const promise = step.action(state, context)
+    const action = step.action
+    const promise = config.wrapAction(
+      step,
+      async () => action(state, context),
+      state,
+      context
+    )
     if (
       (promise && typeof promise.then !== 'function') ||
       (!promise && promise !== undefined)
@@ -358,7 +392,7 @@ async function runNext(
     }
     await Promise.resolve(promise)
     console.log('\b\b\b', chalk.bold.green('OK'), formatTimeTaken())
-    showLog()
+    flushLog()
     tester.actionPassed()
   } catch (e) {
     const definition =
@@ -378,16 +412,37 @@ async function runNext(
       console.log('\b\b\b', chalk.bold.red('NG'), formatTimeTaken())
       console.log(chalk.red(indentString(e.stack + '\n' + definition, indent)))
     }
-    showLog()
+    flushLog()
     onError(e)
     tester.actionFailed(e)
+  } finally {
+    currentActionContext.current = null
   }
 
-  function showLog() {
+  function flushLog() {
     for (const item of log) {
       const logText =
-        chalk.dim('* ') + chalk.cyan(indentString(item, 2).substr(2))
+        chalk.dim('* ') + chalk.cyan(indentString(item.text, 2).substr(2))
       console.log(indentString(logText, indent))
+    }
+    const allure = singletonAllureInstance.currentInstance
+    if (allure) {
+      if (log.length > 0) {
+        const logText = log
+          .map(item => {
+            const prefix = `[${new Date(item.timestamp).toJSON()}] `
+            return (
+              prefix +
+              indentString(item.text, prefix.length).substr(prefix.length)
+            )
+          })
+          .join('\n')
+        allure.addAttachment(
+          'Action log',
+          Buffer.from(logText, 'utf8'),
+          'text/plain'
+        )
+      }
     }
   }
 }

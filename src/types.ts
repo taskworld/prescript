@@ -5,10 +5,24 @@ declare global {
     interface GlobalState {
       [key: string]: unknown
     }
+    interface PrescriptionState {
+      [key: string]: unknown
+    }
   }
 }
 
 export type StepDefName = StepName | string
+
+export interface IConfig {
+  wrapAction?: ActionWrapper
+}
+
+export type ActionWrapper = (
+  step: IStep,
+  execute: () => Promise<void>,
+  state: Prescript.GlobalState,
+  context: ITestExecutionContext
+) => Promise<void>
 
 export interface IStep {
   name: StepName
@@ -78,6 +92,14 @@ export interface ITestExecutionContext {
    * @param args Arguments to be formatted.
    */
   log(format: any, ...args: any[]): void
+
+  /**
+   * This adds an attachment to the current step, such as screenshot, JSON result, etc.
+   * @param name Name of the attachment
+   * @param buffer Attachment content
+   * @param mimeType MIME type of the attachment (image/jpeg, text/plain, application/json...)
+   */
+  attach(name: string, buffer: Buffer, mimeType: string): void
 }
 
 export interface IIterationListener {
