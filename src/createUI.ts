@@ -75,10 +75,10 @@ export default function createUI() {
             step.number === currentStepNumber
               ? chalk.bold.blue('次は')
               : previousResult && step.number === previousResult.stepNumber
-                ? previousResult.error
-                  ? chalk.bold.bgRed(' NG ')
-                  : chalk.bold.bgGreen(' OK ')
-                : '    '
+              ? previousResult.error
+                ? chalk.bold.bgRed(' NG ')
+                : chalk.bold.bgGreen(' OK ')
+              : '    '
           printed = true
           console.log(prefix, prettyFormatStep(step))
         })
