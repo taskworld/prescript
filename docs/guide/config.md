@@ -8,7 +8,7 @@
 You can use this to require other supporting modules to alter Node.js runtime
 behavior, e.g. `ts-node/register`.
 
-## `actionWrapper`
+## `wrapAction`
 
 You can setup an action wrapper that will wrap all action steps. It is like a
 middleware. It can be used for various purposes:
@@ -18,7 +18,7 @@ middleware. It can be used for various purposes:
 * etc.
 
 ```js
-exports.actionWrapper = async (step, execute, state, context) => {
+exports.wrapAction = async (step, execute, state, context) => {
   // Stuff to do before executing the action.
   // Example: Record the start time.
   try {
