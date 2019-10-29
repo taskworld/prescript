@@ -86,7 +86,12 @@ pending()
 ```
 <!-- prettier-ignore-end -->
 
-Defines a **pending step.**
+Defines a **pending step.** When a pending step is run, it marks the test as pending.
+
+- When running in **development mode**, this causes the test to **pause**.
+- When run in **non-interactive mode**, prescript will **exit with code 2**.
+
+See more example how to use a pending step [here](https://prescript.netlify.com/guide/writing-tests.html#pending-steps).
 
 ## `getCurrentState()`
 
