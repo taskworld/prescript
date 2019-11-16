@@ -3,7 +3,7 @@
 Import `prescript` to access its APIs.
 
 ```js
-const { test, to, action, defer, pending, named } = require('prescript')
+const { test, to, action, defer, pending, independent } = require('prescript')
 ```
 
 ## `test`
@@ -40,15 +40,14 @@ action`Fill in username`(async (state, context) => { /* Action here */ })
 Creates an **action step.** The function passed to `action()` will be called
 with these arguments:
 
-* **state** - The state object. In the beginning of the test, it is empty. Add
+- **state** - The state object. In the beginning of the test, it is empty. Add
   things to this object to share state between steps and have it persisted
   between reloads.
-* **context** - The context object contains:
-  * `log(...)` - Logs a message to the console. Use this instead of
+- **context** - The context object contains:
+  - `log(...)` - Logs a message to the console. Use this instead of
     `console.log()` so that it doesn’t mess up console output.
-  * `attach(name, buffer, mimeType)` — Attachs some binary output. For
-    example, screenshots, raw API response. This will get written to the Allure
-    report.
+  - `attach(name, buffer, mimeType)` — Attachs some binary output. For example,
+    screenshots, raw API response. This will get written to the Allure report.
 
 ## `defer`
 
@@ -86,12 +85,14 @@ pending()
 ```
 <!-- prettier-ignore-end -->
 
-Defines a **pending step.** When a pending step is run, it marks the test as pending.
+Defines a **pending step.** When a pending step is run, it marks the test as
+pending.
 
 - When running in **development mode**, this causes the test to **pause**.
 - When run in **non-interactive mode**, prescript will **exit with code 2**.
 
-See more example how to use a pending step [here](https://prescript.netlify.com/guide/writing-tests.html#pending-steps).
+See more example how to use a pending step
+[here](https://prescript.netlify.com/guide/writing-tests.html#pending-steps).
 
 ## `getCurrentState()`
 
@@ -112,3 +113,19 @@ requiring users to pass the `state` object all the way from the action.
 This can make writing tests more convenient, but treat this like a global
 variable — it introduces an _implicit_ runtime dependency from the caller to
 prescript’s internal state.
+
+## `independent(() => { ... })`
+
+Steps directly inside this block will be run independently. For example, in the
+following code, actions A, B, and C would always be run even if preceding
+actions failed. However, action D will not be run if any previous actions
+failed.
+
+```js
+independent(() => {
+  action`A`(...)
+  action`B`(...)
+  action`C`(...)
+})
+action`D`(...)
+```

@@ -1,0 +1,19 @@
+const { test, action, independent } = require('../../..')
+
+independent(() => {
+  test('Test 1', () => {
+    action('Test 1 action', () => {
+      throw new Error('a')
+    })
+  })
+
+  test('Test 2', () => {
+    action('Test 2 action', () => {})
+  })
+
+  test('Test 3', () => {
+    action('Test 3 action', () => {
+      throw new Error('b')
+    })
+  })
+})

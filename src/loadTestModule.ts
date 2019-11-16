@@ -35,6 +35,7 @@ function loadTest(
   let currentTest: ITest | null
 
   const logger: ITestLoadLogger = inLogger || createNullLogger()
+  const independentContextSet = new Set<IStep>()
 
   function appendStep<X>(
     options: {
@@ -50,7 +51,7 @@ function loadTest(
     const { name, creator, definition, cleanup, defer, pending } = options
     if (!currentStep) {
       throw new Error(
-        'Invalid state... This should not happen! currentState is null.'
+        'Invalid state... This should not happen! currentStep is null.'
       )
     }
     if (currentStep.action) {
@@ -62,11 +63,13 @@ function loadTest(
     if (!parentStep.children) {
       parentStep.children = []
     }
+    const independent = independentContextSet.has(parentStep)
     const number =
       (parentStep.number ? parentStep.number + '.' : '') +
       (parentStep.children.length + 1)
     const childStep: IStep = {
       name,
+      independent,
       creator,
       definition,
       cleanup,
@@ -293,6 +296,19 @@ function loadTest(
           })
         }
       )
+    },
+    independent(f) {
+      if (!currentStep) {
+        throw new Error(
+          'Invalid state... This should not happen! currentStep is null.'
+        )
+      }
+      independentContextSet.add(currentStep)
+      try {
+        return f()
+      } finally {
+        independentContextSet.delete(currentStep)
+      }
     }
   }
 

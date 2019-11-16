@@ -97,6 +97,13 @@ export function pending(): void {
   getInstance().pending()
 }
 
+/**
+ * Marks the steps inside as independent
+ */
+export function independent<X>(f: () => X): X {
+  return getInstance().independent(f)
+}
+
 /** @deprecated Use `to()` instead. */
 export function step<X>(name: StepDefName, f: () => X): X
 

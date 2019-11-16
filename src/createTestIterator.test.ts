@@ -125,6 +125,75 @@ describe('a test iterator', () => {
     })
   })
 
+  describe('a test with independent step', () => {
+    const test = load(({ to, defer, action, independent }) => {
+      action`Arrange`(async () => {})
+      defer`Teardown`(async () => {})
+      action`Act`(async () => {})
+      to`Asserts`(() => {
+        independent(() => {
+          action`Assert 1`(async () => {})
+          action`Assert 2`(async () => {})
+          to`Child asserts`(() => {
+            action`Assert 3`(async () => {})
+            action`Assert 4`(async () => {})
+          })
+          to`Independent child asserts`(() => {
+            independent(() => {
+              action`Assert 5`(async () => {})
+              action`Assert 6`(async () => {})
+            })
+          })
+        })
+      })
+      action`Follow up`(async () => {})
+    })
+    it('should run all assertions normally', () => {
+      const sequence = getStepSequence(test)
+      expect(sequence).toEqual([
+        'Arrange',
+        'Act',
+        'Assert 1',
+        'Assert 2',
+        'Assert 3',
+        'Assert 4',
+        'Assert 5',
+        'Assert 6',
+        'Follow up',
+        'Teardown'
+      ])
+    })
+    it('should keep on running independent assertions', () => {
+      const sequence = getStepSequence(test, { failingSteps: ['Assert 1'] })
+      expect(sequence).toEqual([
+        'Arrange',
+        'Act',
+        'Assert 1',
+        'Assert 2',
+        'Assert 3',
+        'Assert 4',
+        'Assert 5',
+        'Assert 6',
+        'Teardown'
+      ])
+    })
+    it('should keep independent one level only', () => {
+      const sequence = getStepSequence(test, {
+        failingSteps: ['Assert 1', 'Assert 3', 'Assert 5']
+      })
+      expect(sequence).toEqual([
+        'Arrange',
+        'Act',
+        'Assert 1',
+        'Assert 2',
+        'Assert 3',
+        'Assert 5',
+        'Assert 6',
+        'Teardown'
+      ])
+    })
+  })
+
   describe('replacing test', () => {
     it('clears the program counter', () => {
       const tester = createTestIterator()
@@ -161,3 +230,23 @@ describe('a test iterator', () => {
     })
   })
 })
+
+function getStepSequence(test, { failingSteps = [] as string[] } = {}) {
+  const tester = createTestIterator()
+  tester.setTest(test)
+  tester.begin()
+  const out: string[] = []
+  const fail = new Set(failingSteps)
+  for (;;) {
+    const step = tester.getCurrentStepNumber()
+    if (step === null) break
+    const name = tester.getCurrentStep().name.toString()
+    out.push(name)
+    if (fail.has(name)) {
+      tester.actionFailed(new Error(`Fail on ${name}`))
+    } else {
+      tester.actionPassed()
+    }
+  }
+  return out
+}

@@ -30,6 +30,7 @@ export interface IStep {
   children?: IStep[]
   creator?: string
   definition?: string
+  independent?: boolean
 
   action?: ActionFunction
   actionDefinition?: string
@@ -78,6 +79,8 @@ export interface IPrescriptAPI {
   cleanup<X>(name: StepDefName, f: () => X): X
 
   onFinish(f: () => void): void
+
+  independent<X>(f: () => X): X
 
   // This is only in IPrescriptAPI
   use(f: (api: IPrescriptAPI) => void): void
