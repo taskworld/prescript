@@ -5,8 +5,15 @@
 
 ## Side-effects
 
-You can use this to require other supporting modules to alter Node.js runtime
-behavior, e.g. `ts-node/register`.
+Before prescript loads your test file, **prescript** will load the `prescript.config.js` file first.
+You can use this opportunity to require other supporting modules that may alter Node.js’ runtime behavior.
+
+For example, this makes **prescript** able to require TypeScript files,
+thus allowing you to write your tests in TypeScript:
+
+```js
+require('ts-node/register')
+```
 
 ## `wrapAction`
 
