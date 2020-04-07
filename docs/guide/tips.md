@@ -41,6 +41,30 @@ action('Action', async state => {
 })
 ```
 
+In some situations, e.g. waiting for changes to be propagated throughout the cluster,
+we may not be sure how many times we have to retry.
+Instead of retrying for a fixed number of time,
+we can also retry until it takes unreasonably long instead.
+
+```js
+export default async function retryUntilTimeout(f, timeout = 15000) {
+  const start = Date.now()
+  let i = 0
+  for (;;) {
+    try {
+      return await f(i++)
+    } catch (error) {
+      if (Date.now() - start > timeout) {
+        throw error
+      } else {
+        const timeToWait = 100 + (Date.now() - start) / 10 // Fine-tune this
+        await new Promise((r) => setTimeout(r, timeToWait))
+      }
+    }
+  }
+}
+```
+
 ## Recovery mechanism
 
 Sometimes your tests may be interrupted by **“ENTER YOUR EMAIL TO SUBSCRIBE TO
