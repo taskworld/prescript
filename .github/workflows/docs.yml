@@ -20,4 +20,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@8457ade3d7045b4842e5a10f733d4153b7d05238
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./docs/.vuepress/dist
