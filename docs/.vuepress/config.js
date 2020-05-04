@@ -1,6 +1,7 @@
 module.exports = {
   title: 'prescript',
   description: 'an end-to-end test runner that sparks joy',
+  base: '/prescript/',
 
   themeConfig: {
     nav: [
