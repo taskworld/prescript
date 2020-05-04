@@ -1,0 +1,24 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - master
+      - docs-revamp
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Build documentation 🔧
+        run: |
+          yarn
+          yarn docs:build
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@8fcf8339cec3a53361d09864b686ac94ecd71f86
+        with:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/.vuepress/dist
