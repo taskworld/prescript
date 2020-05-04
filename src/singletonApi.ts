@@ -34,7 +34,7 @@ export function to<X>(name: string, f: () => X): X
 export function to(
   nameParts: TemplateStringsArray,
   ...substitutions: any[]
-): <X>(f: () => X) => X
+): <X>(f?: () => X) => X
 
 /**
  * Creates a Compound Test Step, which can contain child steps.
@@ -54,7 +54,7 @@ export function action(name: string, f: ActionFunction): void
 export function action(
   nameParts: TemplateStringsArray,
   ...substitutions: any[]
-): (f: ActionFunction) => void
+): (f?: ActionFunction) => void
 
 /**
  * Makes the enclosing `step()` an Action Step.
@@ -80,7 +80,7 @@ export function defer(name: string, f: ActionFunction): void
 export function defer(
   nameParts: TemplateStringsArray,
   ...substitutions: any[]
-): (f: ActionFunction) => void
+): (f?: ActionFunction) => void
 
 /**
  * Creates a Deferred Action Step, for, e.g., cleaning up resources.
@@ -95,6 +95,13 @@ export function defer(...args) {
  */
 export function pending(): void {
   getInstance().pending()
+}
+
+/**
+ * Marks the steps inside as independent
+ */
+export function independent<X>(f: () => X): X {
+  return getInstance().independent(f)
 }
 
 /** @deprecated Use `to()` instead. */

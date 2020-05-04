@@ -83,7 +83,7 @@ function createStepper(
               visitor.visitDeferNode(child)
             }
             deferredSteps.push(child)
-          } else if (child.cleanup || stillOk) {
+          } else if (child.cleanup || child.independent || stillOk) {
             stillOk = (yield* walk(child)) && stillOk
           }
         }

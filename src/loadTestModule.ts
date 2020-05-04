@@ -35,6 +35,7 @@ function loadTest(
   let currentTest: ITest | null
 
   const logger: ITestLoadLogger = inLogger || createNullLogger()
+  const independentContextSet = new Set<IStep>()
 
   function appendStep<X>(
     options: {
@@ -50,7 +51,7 @@ function loadTest(
     const { name, creator, definition, cleanup, defer, pending } = options
     if (!currentStep) {
       throw new Error(
-        'Invalid state... This should not happen! currentState is null.'
+        'Invalid state... This should not happen! currentStep is null.'
       )
     }
     if (currentStep.action) {
@@ -62,11 +63,13 @@ function loadTest(
     if (!parentStep.children) {
       parentStep.children = []
     }
+    const independent = independentContextSet.has(parentStep)
     const number =
       (parentStep.number ? parentStep.number + '.' : '') +
       (parentStep.children.length + 1)
     const childStep: IStep = {
       name,
+      independent,
       creator,
       definition,
       cleanup,
@@ -161,6 +164,15 @@ function loadTest(
     }
   }
 
+  const DEFAULT_COMPOSITE_STEP = () => {
+    context.pending()
+  }
+  const DEFAULT_ACTION_STEP = async () => {
+    const error = new Error('[pending]')
+    ;(error as any).__prescriptPending = true
+    throw error
+  }
+
   const context: IPrescriptAPI = {
     step<X>(inName: StepDefName, f: () => X): X {
       ensureDeprecatedAPIUsersDoNotUseTaggedTemplate(inName)
@@ -213,7 +225,7 @@ function loadTest(
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Action Step: ${name}`))
         )
-        return (f: ActionFunction) =>
+        return (f: ActionFunction = DEFAULT_ACTION_STEP) =>
           appendStep({ name, definition }, () => {
             return setAction(f, definition)
           })
@@ -240,7 +252,7 @@ function loadTest(
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Deferred Action Step: ${name}`))
         )
-        return (f: ActionFunction) =>
+        return (f: ActionFunction = DEFAULT_ACTION_STEP) =>
           appendStep({ name, definition, defer: true }, () => {
             return setAction(f, definition)
           })
@@ -261,7 +273,8 @@ function loadTest(
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Composite Step: ${name}`))
         )
-        return <X>(f: () => X) => appendStep({ name, definition }, f)
+        return <X>(f: () => X = DEFAULT_COMPOSITE_STEP as any) =>
+          appendStep({ name, definition }, f)
       } else {
         const name = StepName.coerce(args[0])
         const definition = getSource(
@@ -283,6 +296,19 @@ function loadTest(
           })
         }
       )
+    },
+    independent(f) {
+      if (!currentStep) {
+        throw new Error(
+          'Invalid state... This should not happen! currentStep is null.'
+        )
+      }
+      independentContextSet.add(currentStep)
+      try {
+        return f()
+      } finally {
+        independentContextSet.delete(currentStep)
+      }
     }
   }
 
