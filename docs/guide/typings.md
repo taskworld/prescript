@@ -7,6 +7,19 @@ right away, even if you are using just JavaScript.
 
 ![Screenshot](./typing-hint.png)
 
+## Writing tests in TypeScript
+
+If you want to write tests in TypeScript, you can [configure prescript](./config.md#side-effects) to inject `ts-node` into the Node.js runtime.
+This will let you write tests in TypeScript.
+
+1. Install `ts-node`.
+
+2. Create `prescript.config.js` with this contents:
+
+    ```js
+    require('ts-node/register/transpile-only')
+    ```
+
 ## Declaring the type of prescript `state`
 
 The type of `state` variable, passed to your action functions in `action()` and
