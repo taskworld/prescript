@@ -105,9 +105,9 @@ have these components set up:
     [selenium-webdriver](https://www.npmjs.com/package/selenium-webdriver) or
     [puppeteer](https://www.npmjs.com/package/puppeteer).
 
-        * **prescript** doesn’t care. You can use any library you want. That means you
-        can also use prescript to test mobile apps, desktop apps, CLI tools, APIs, or
-        anything.
+    * **prescript** doesn’t care. You can use any library you want. That means you
+    can also use prescript to test mobile apps, desktop apps, CLI tools, APIs, or
+    anything.
 
 2.  **Test runner.** They provide a way to organize your test code and run it.
     **prescript** is a test runner. Different test runners have different ways
