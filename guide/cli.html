@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Running a test (CLI) | prescript</title>
+    <meta name="generator" content="VuePress 1.4.1">
+    
+    <meta name="description" content="an end-to-end test runner that sparks joy">
+    <link rel="preload" href="/assets/css/0.styles.aa6d0e5c.css" as="style"><link rel="preload" href="/assets/js/app.9890758b.js" as="script"><link rel="preload" href="/assets/js/2.88f39d50.js" as="script"><link rel="preload" href="/assets/js/12.817b8d38.js" as="script"><link rel="prefetch" href="/assets/js/10.515d8d3c.js"><link rel="prefetch" href="/assets/js/11.175271cf.js"><link rel="prefetch" href="/assets/js/13.2b031eb4.js"><link rel="prefetch" href="/assets/js/14.8b3e2010.js"><link rel="prefetch" href="/assets/js/3.854d05ae.js"><link rel="prefetch" href="/assets/js/4.7f3adafd.js"><link rel="prefetch" href="/assets/js/5.e6ef8d81.js"><link rel="prefetch" href="/assets/js/6.4951d5b1.js"><link rel="prefetch" href="/assets/js/7.9cdea821.js"><link rel="prefetch" href="/assets/js/8.89f5674c.js"><link rel="prefetch" href="/assets/js/9.0b415673.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.aa6d0e5c.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">prescript</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/guide/" class="nav-link router-link-active">
+  Guide
+</a></div><div class="nav-item"><a href="https://github.com/taskworld/prescript" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  GitHub
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link">
+  Home
+</a></div><div class="nav-item"><a href="/guide/" class="nav-link router-link-active">
+  Guide
+</a></div><div class="nav-item"><a href="https://github.com/taskworld/prescript" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  GitHub
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <!----></nav>  <ul class="sidebar-links"><li><section class="sidebar-group depth-0"><p class="sidebar-heading open"><span>User guide</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/guide/" class="sidebar-link">Introduction</a></li><li><a href="/guide/tutorial.html" class="sidebar-link">A quick prescript primer (Tutorial)</a></li><li><a href="/guide/writing-tests.html" class="sidebar-link">Writing tests in prescript</a></li><li><a href="/guide/cli.html" class="active sidebar-link">Running a test (CLI)</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/guide/cli.html#development-mode" class="sidebar-link">Development mode</a></li><li class="sidebar-sub-header"><a href="/guide/cli.html#non-interactive-mode" class="sidebar-link">Non-interactive mode</a></li><li class="sidebar-sub-header"><a href="/guide/cli.html#when-a-test-file-contain-multiple-tests" class="sidebar-link">When a test file contain multiple tests</a></li><li class="sidebar-sub-header"><a href="/guide/cli.html#exit-code" class="sidebar-link">Exit code</a></li><li class="sidebar-sub-header"><a href="/guide/cli.html#running-multiple-tests" class="sidebar-link">Running multiple tests</a></li></ul></li><li><a href="/guide/api.html" class="sidebar-link">API</a></li><li><a href="/guide/config.html" class="sidebar-link">Advanced configuration</a></li><li><a href="/guide/tips.html" class="sidebar-link">Tips for writing tests</a></li></ul></section></li><li><section class="sidebar-group depth-0"><p class="sidebar-heading"><span>More topics</span> <!----></p> <ul class="sidebar-links sidebar-group-items"><li><a href="/guide/typings.html" class="sidebar-link">VS Code JavaScript IntelliSense and/or TypeScript Support</a></li></ul></section></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="running-a-test-cli"><a href="#running-a-test-cli" class="header-anchor">#</a> Running a test (CLI)</h1> <h2 id="development-mode"><a href="#development-mode" class="header-anchor">#</a> Development mode</h2> <p>The <strong>development mode</strong> provides the <strong>prescript interactive shell</strong> which
+allows you to hot-reload the tests, or jump to steps in the test.</p> <p>To run a test in development mode:</p> <div class="language- extra-class"><pre class="language-text"><code>yarn prescript tests/Filename.js -d
+</code></pre></div><h2 id="non-interactive-mode"><a href="#non-interactive-mode" class="header-anchor">#</a> Non-interactive mode</h2> <p>The <strong>non-interactive mode</strong> is for using in CI systems. The prescript
+interactive shell is not available here, but an Allure test result files may be
+generated in this mode.</p> <p>To run a test in non-interactive mode:</p> <div class="language- extra-class"><pre class="language-text"><code>yarn prescript tests/Filename.js
+</code></pre></div><h2 id="when-a-test-file-contain-multiple-tests"><a href="#when-a-test-file-contain-multiple-tests" class="header-anchor">#</a> When a test file contain multiple tests</h2> <p>As introduced earlier, a prescript process only runs a single test once.
+However, for ease of use and flexibility, a test file may define multiple tests.
+Each test can be uniquely identified by its <strong>test name.</strong></p> <p>You don’t have to specify the test name to run if there is only one test.
+However, if a test file declares multiple tests, prescript will refuse to run.
+In this case, you must explicitly specify the name of the test to run.</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">yarn</span> prescript <span class="token punctuation">[</span>-d<span class="token punctuation">]</span> tests/Filename.js <span class="token string">&quot;Test name&quot;</span>
+</code></pre></div><p>You can list all tests using:</p> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token function">yarn</span> prescript tests/Filename.js --list
+<span class="token function">yarn</span> prescript tests/Filename.js --list --json
+</code></pre></div><h2 id="exit-code"><a href="#exit-code" class="header-anchor">#</a> Exit code</h2> <div class="custom-block tip"><p class="custom-block-title">NOTE</p> <p>Exit codes only apply to non-interactive mode</p></div> <table><thead><tr><th>Exit Code</th> <th>Description</th></tr></thead> <tbody><tr><td>0</td> <td>Successful test</td></tr> <tr><td>1</td> <td>Failed test</td></tr> <tr><td>2</td> <td>Pending test</td></tr> <tr><td>3</td> <td>Multiple tests defined</td></tr></tbody></table> <h2 id="running-multiple-tests"><a href="#running-multiple-tests" class="header-anchor">#</a> Running multiple tests</h2> <p>prescript <strong>by design</strong> only runs a single test. This allows prescript to remain
+a simple tool. You must implement your own test orchestrator to fit it to your
+project needs, which may include:</p> <ul><li>Running all tests.</li> <li>Running only a subset of tests.</li> <li>Running tests sequentially.</li> <li>Running tests in parallel.</li> <li>Distributing tests to be run on a cluster of test runner machines.</li> <li>Randomizing or specify the order of tests.</li> <li>Retrying failed tests.</li> <li>Aborting the test in case of too many failures.</li> <li>Preparing environment variables before running tests.</li></ul> <p>If prescript supported all of the above, it would make prescript unnecessarily
+complex. Therefore, prescript requires you to write your own test orchestrator.
+<a href="https://github.com/taskworld/prescript/tree/78c094874fc3ae54107003ec976d211c106c330d/examples/testAll.js" target="_blank" rel="noopener noreferrer">It’s just a few lines of code!<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></p></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/guide/writing-tests.html" class="prev">
+        Writing tests in prescript
+      </a></span> <span class="next"><a href="/guide/api.html">
+        API
+      </a>
+      →
+    </span></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.9890758b.js" defer></script><script src="/assets/js/2.88f39d50.js" defer></script><script src="/assets/js/12.817b8d38.js" defer></script>
+  </body>
+</html>
