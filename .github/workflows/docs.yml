@@ -16,9 +16,8 @@ jobs:
         run: |
           yarn
           yarn docs:build
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@8fcf8339cec3a53361d09864b686ac94ecd71f86
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@8457ade3d7045b4842e5a10f733d4153b7d05238
         with:
-          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: docs/.vuepress/dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
