@@ -1,11 +1,11 @@
-name: Build and Deploy
+name: Deploy documentation site
 on:
   push:
     branches:
       - master
       - docs-revamp
 jobs:
-  docs:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
