@@ -19,4 +19,4 @@ the whole test suite.
 
 ## Documentation
 
-[Documentation is available on our website.](https://prescript.netlify.com)
+[Documentation is available on our website.](https://taskworld.github.io/prescript/)
