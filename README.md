@@ -20,3 +20,17 @@ the whole test suite.
 ## Documentation
 
 [Documentation is available on our website.](https://taskworld.github.io/prescript/)
+
+## Development
+
+Running Prescript example scenarios:
+
+```sh
+yarn test-examples
+```
+
+Running unit tests:
+
+```sh
+yarn test
+```
