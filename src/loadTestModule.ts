@@ -183,7 +183,7 @@ function loadTest(
       return appendStep({ name, definition }, f)
     },
     test(...args: any[]): any {
-      if (Array.isArray(args[0])) {
+      if (isTemplateString(args[0])) {
         const name = StepName.named(args[0], ...args.slice(1))
         return <X>(f: () => X) => appendTest(name, f)
       } else {
@@ -220,7 +220,7 @@ function loadTest(
       return m(context)
     },
     action<X>(...args: any[]): any {
-      if (Array.isArray(args[0])) {
+      if (isTemplateString(args[0])) {
         const name = StepName.named(args[0], ...args.slice(1))
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Action Step: ${name}`))
@@ -247,7 +247,7 @@ function loadTest(
       }
     },
     defer(...args: any[]): any {
-      if (Array.isArray(args[0])) {
+      if (isTemplateString(args[0])) {
         const name = StepName.named(args[0], ...args.slice(1))
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Deferred Action Step: ${name}`))
@@ -268,7 +268,7 @@ function loadTest(
       }
     },
     to(...args: any[]): any {
-      if (Array.isArray(args[0])) {
+      if (isTemplateString(args[0])) {
         const name = StepName.named(args[0], ...args.slice(1))
         const definition = getSource(
           ErrorStackParser.parse(new Error(`Composite Step: ${name}`))
@@ -391,3 +391,7 @@ function createTest(root: IStep): ITest {
 }
 
 export default loadTest
+
+function isTemplateString(input: any): input is TemplateStringsArray {
+  return Array.isArray(input)
+}

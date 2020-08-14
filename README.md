@@ -29,6 +29,12 @@ Running Prescript example scenarios:
 yarn test-examples
 ```
 
+Running individual scenario:
+
+```sh
+./bin/prescript "./examples/calculator/tests/Basic addition (page object).js"
+```
+
 Running unit tests:
 
 ```sh
