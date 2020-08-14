@@ -6,10 +6,7 @@ const { execFileSync } = require('child_process')
 
 action('Run test (it should fail)', async () => {
   let failed = false
-  execFileSync('rm', [
-    '-rf',
-    'tmp/issue27-allure-results'
-  ])
+  execFileSync('rm', ['-rf', 'tmp/issue27-allure-results'])
   try {
     execFileSync(
       './bin/prescript',
@@ -35,14 +32,19 @@ action('Verify that there is an XML allure result generated', async () => {
 })
 
 action('Generate an allure-report', async () => {
-  execFileSync(
-    'yarn',
-    ['allure', 'generate', '--clean', ...['--output', 'tmp/issue27-allure-report'], 'tmp/issue27-allure-results']
-  )
+  execFileSync('yarn', [
+    'allure',
+    'generate',
+    '--clean',
+    ...['--output', 'tmp/issue27-allure-report'],
+    'tmp/issue27-allure-results'
+  ])
   assert(fs.existsSync('tmp/issue27-allure-report'), 'Expected report to exist')
 })
 
 action('Verify that there is a test case file', async () => {
-  const files = glob.sync('*.json', { cwd: 'tmp/issue27-allure-report/data/test-cases' })
+  const files = glob.sync('*.json', {
+    cwd: 'tmp/issue27-allure-report/data/test-cases'
+  })
   assert(files.length > 0, 'Expected test case JSON files to exist')
 })
