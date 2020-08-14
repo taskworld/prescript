@@ -1,11 +1,8 @@
-const { action, pending } = require('../../..')
+const { action } = require('../../..')
 const assert = require('assert')
 const fs = require('fs')
 const glob = require('glob')
 const { execFileSync } = require('child_process')
-
-// To fix in later PR
-pending()
 
 action('Run test (it should fail)', async () => {
   let failed = false
@@ -29,9 +26,9 @@ action('Run test (it should fail)', async () => {
   assert(failed, 'Expected prescript command to fail')
 })
 
-action('Verify that there is an XML allure result generated', async () => {
-  const files = glob.sync('*.xml', { cwd: 'tmp/issue27-allure-results' })
-  assert(files.length > 0, 'Expected to file XML files')
+action('Verify that there are JSON allure results generated', async () => {
+  const files = glob.sync('*.json', { cwd: 'tmp/issue27-allure-results' })
+  assert(files.length > 0, 'Expected to file JSON files')
 })
 
 action('Generate an allure-report', async () => {
