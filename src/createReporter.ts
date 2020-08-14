@@ -1,4 +1,5 @@
 import path from 'path'
+import { createHash } from 'crypto'
 import singletonAllureInstance from './singletonAllureInstance'
 import {
   AllureRuntime,
@@ -7,9 +8,9 @@ import {
   AllureTest,
   AllureStep,
   Stage,
-  Status,
-  ContentType
+  Status
 } from 'allure-js-commons'
+import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 
 export default function createReporter(testModulePath, rootStepName) {
   if (
@@ -32,23 +33,19 @@ export default function createReporter(testModulePath, rootStepName) {
   const allureConfig: IAllureConfig = {
     resultsDir: process.env.ALLURE_RESULTS_DIR || 'allure-results'
   }
-  const runtime = new AllureRuntime(allureConfig)
+  const writer = new AllureWriter(allureConfig)
+  const runtime = new AllureRuntime({ ...allureConfig, writer })
   const group = runtime.startGroup(suiteName)
   const test = group.startTest(caseName)
   let stack: IStepStack = new TestStepStack(test)
   singletonAllureInstance.currentReportingInterface = {
     addAttachment: (name, buf, mimeType) => {
-      let file: string
-      try {
-        file = runtime.writeAttachment(buf, mimeType as any)
-      } catch (error) {
-        if (error.message.match(/Unrecognized extension/)) {
-          file = runtime.writeAttachment(buf, ContentType.TEXT)
-        } else {
-          throw error
-        }
-      }
-      stack.getExecutableItem().addAttachment(name, mimeType as any, file)
+      const sha = createHash('sha256')
+        .update(buf)
+        .digest('hex')
+      const fileName = sha + path.extname(name)
+      writer.writeAttachment(fileName, buf)
+      stack.getExecutableItem().addAttachment(name, mimeType as any, fileName)
     }
   }
   return {
