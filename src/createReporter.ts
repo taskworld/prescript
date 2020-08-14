@@ -7,7 +7,8 @@ import {
   AllureTest,
   AllureStep,
   Stage,
-  Status
+  Status,
+  ContentType
 } from 'allure-js-commons'
 
 export default function createReporter(testModulePath, rootStepName) {
@@ -37,7 +38,16 @@ export default function createReporter(testModulePath, rootStepName) {
   let stack: IStepStack = new TestStepStack(test)
   singletonAllureInstance.currentReportingInterface = {
     addAttachment: (name, buf, mimeType) => {
-      const file = runtime.writeAttachment(buf, mimeType as any)
+      let file: string
+      try {
+        file = runtime.writeAttachment(buf, mimeType as any)
+      } catch (error) {
+        if (error.message.match(/Unrecognized extension/)) {
+          file = runtime.writeAttachment(buf, ContentType.TEXT)
+        } else {
+          throw error
+        }
+      }
       stack.getExecutableItem().addAttachment(name, mimeType as any, file)
     }
   }
