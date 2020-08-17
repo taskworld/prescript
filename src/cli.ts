@@ -357,11 +357,12 @@ async function runNext(
       })
     },
     attach: (name, buffer, mimeType) => {
-      const allure = singletonAllureInstance.currentInstance
       const buf = Buffer.from(buffer)
-      if (allure) {
-        allure.addAttachment(name, buf, mimeType)
-      }
+      singletonAllureInstance.currentReportingInterface.addAttachment(
+        name,
+        buf,
+        mimeType
+      )
       context.log(
         'Attachment added: "%s" (%s, %s bytes)',
         name,
@@ -425,24 +426,21 @@ async function runNext(
         chalk.dim('* ') + chalk.cyan(indentString(item.text, 2).substr(2))
       console.log(indentString(logText, indent))
     }
-    const allure = singletonAllureInstance.currentInstance
-    if (allure) {
-      if (log.length > 0) {
-        const logText = log
-          .map(item => {
-            const prefix = `[${new Date(item.timestamp).toJSON()}] `
-            return (
-              prefix +
-              indentString(item.text, prefix.length).substr(prefix.length)
-            )
-          })
-          .join('\n')
-        allure.addAttachment(
-          'Action log',
-          Buffer.from(logText, 'utf8'),
-          'text/plain'
-        )
-      }
+    if (log.length > 0) {
+      const logText = log
+        .map(item => {
+          const prefix = `[${new Date(item.timestamp).toJSON()}] `
+          return (
+            prefix +
+            indentString(item.text, prefix.length).substr(prefix.length)
+          )
+        })
+        .join('\n')
+      singletonAllureInstance.currentReportingInterface.addAttachment(
+        'Action log',
+        Buffer.from(logText, 'utf8'),
+        'text/plain'
+      )
     }
   }
 }

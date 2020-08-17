@@ -29,10 +29,10 @@ jobs:
           command: ALLURE_SUITE_NAME=prescript-examples yarn run test-examples
       - run:
           name: allure
+          when: always
           command: |
             mkdir -p /tmp/allure-report
-            sudo npm install -g allure-commandline
-            allure generate allure-results -o "/tmp/allure-report"
+            yarn allure generate allure-results -o "/tmp/allure-report"
       - store_artifacts:
           path: /tmp/allure-report
           prefix: allure-report
