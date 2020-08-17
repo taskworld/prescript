@@ -8,8 +8,10 @@ import {
   AllureTest,
   AllureStep,
   Stage,
-  Status
+  Status,
+  LabelName
 } from 'allure-js-commons'
+import { hostname } from 'os'
 import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 
 export default function createReporter(testModulePath, rootStepName) {
@@ -29,6 +31,9 @@ export default function createReporter(testModulePath, rootStepName) {
     return `${testPath}${testName ? ` - ${testName}` : ''}`
   }
   const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
+  const historyId = createHash('md5')
+    .update([suiteName, caseName].join(' / '))
+    .digest('hex')
 
   const allureConfig: IAllureConfig = {
     resultsDir: process.env.ALLURE_RESULTS_DIR || 'allure-results'
@@ -37,6 +42,11 @@ export default function createReporter(testModulePath, rootStepName) {
   const runtime = new AllureRuntime({ ...allureConfig, writer })
   const group = runtime.startGroup(suiteName)
   const test = group.startTest(caseName)
+  const prescriptVersion = require('../package').version
+  test.historyId = historyId
+  test.addLabel(LabelName.THREAD, `${process.pid}`)
+  test.addLabel(LabelName.HOST, `${hostname()}`)
+  test.addLabel(LabelName.FRAMEWORK, `prescript@${prescriptVersion}`)
   let stack: IStepStack = new TestStepStack(test)
   singletonAllureInstance.currentReportingInterface = {
     addAttachment: (name, buf, mimeType) => {
