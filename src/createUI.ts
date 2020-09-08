@@ -2,6 +2,7 @@ import chalk from 'chalk'
 import util from 'util'
 import prettyFormatStep from './prettyFormatStep'
 import { IStep, ITestIterator } from './types'
+import WebSocket from 'ws'
 
 export default function createUI() {
   const ui = {
@@ -37,15 +38,21 @@ export default function createUI() {
     },
 
     developmentModeStarted(environment: IEnvironment) {
-      startInteractiveMode(environment)
-      connectToExternalUI(environment, 'ws://localhost:19999/DUMMYDEBUG')
+      const interactive = startInteractiveMode(environment)
+      connectToExternalUI(interactive, 'ws://localhost:19999/DUMMYDEBUG')
     }
   }
 
   return ui
 }
 
-function startInteractiveMode(environment: IEnvironment) {
+function startInteractiveMode(environment: IEnvironment): IInteractiveMode {
+  const stateChangeListeners = new Set<() => void>()
+  let latestRun: { running: boolean } = { running: false }
+  const notifyStateChanged = () => {
+    for (const fn of stateChangeListeners) fn()
+  }
+
   console.log(chalk.bold.yellow('## Entering development mode...'))
   console.log('Welcome to prescript development mode.')
   console.log()
@@ -159,16 +166,62 @@ function startInteractiveMode(environment: IEnvironment) {
 
   vorpal.delimiter('prescript>').show()
 
+  return {
+    run(command) {
+      return vorpal.exec(command)
+    },
+    onStateChanged(fn) {
+      stateChangeListeners.add(fn)
+    },
+    getState() {
+      const steps: any[] = []
+      environment.forEachStep(step => {
+        steps.push({
+          name: step.name.toString(),
+          composite: step.children ? step.children.length > 0 : false,
+          children: step.children
+            ? (step.children.map(s => s.number).filter(x => x) as string[])
+            : [],
+          number: step.number,
+          creator: step.creator,
+          action: !!step.action,
+          actionDefinition: step.actionDefinition,
+          pending: step.pending,
+          cleanup: step.cleanup,
+          defer: step.defer
+        })
+      })
+      const previousResult = environment.getPreviousResult()
+      return {
+        steps: steps,
+        running: latestRun.running,
+        currentStepNumber: environment.getCurrentStepNumber(),
+        previousResult: previousResult
+          ? {
+              stepNumber: previousResult.stepNumber,
+              error: previousResult.error ? previousResult.error.stack : null
+            }
+          : null
+      }
+    }
+  }
+
   function handleRun(promise, callback) {
+    const currentRun = { running: true }
+    latestRun = currentRun
+    notifyStateChanged()
     return promise.then(
       () => {
+        currentRun.running = false
         announcePrevious()
         announceStatus()
         console.log()
         callback && callback()
       },
       err => {
+        currentRun.running = false
         callback && callback(err)
+        notifyStateChanged()
       }
     )
   }
@@ -205,6 +258,7 @@ function startInteractiveMode(environment: IEnvironment) {
       hint('status', 'to see the test plan')
       hint('jump', 'to jump to a step number')
     }
+    notifyStateChanged()
   }
 
   function hint(commandName, description) {
@@ -212,9 +266,55 @@ function startInteractiveMode(environment: IEnvironment) {
   }
 }
 
-function connectToExternalUI(environment: IEnvironment, endpoint: string) {
-  // TODO: Implement external UI
+function connectToExternalUI(
+  interactiveMode: IInteractiveMode,
+  endpoint: string
+) {
+  const client = new WebSocket(endpoint)
+  const sendState = () => {
+    const state = interactiveMode.getState()
+    client.send(JSON.stringify({ state: state }))
+  }
+  client.on('error', e => {
+    console.log('(External UI failed to connect: ' + e + ')')
+  })
+  client.on('open', () => {
+    ;(client as any)._socket.unref()
+    console.log('(External UI connected)')
+    interactiveMode.onStateChanged(() => {
+      sendState()
+    })
+    client.on('message', async raw => {
+      const data = JSON.parse(raw.toString())
+      if (data.run) {
+        try {
+          await interactiveMode.run(data.run.command)
+          client.send(
+            JSON.stringify({ ack: { ackId: data.run.ackId, error: null } })
+          )
+        } catch (error) {
+          client.send(
+            JSON.stringify({
+              ack: { ackId: data.run.ackId, error: error.stack }
+            })
+          )
+        }
+      }
+    })
+    sendState()
+  })
+  client.on('close', () => {
+    console.log('(External UI disconnected)')
+  })
 }
+
+interface IInteractiveMode {
+  getState(): IInteractiveState
+  onStateChanged(fn: () => void): void
+  run(command: string): Promise<void>
+}
+
+interface IInteractiveState {}
 
 interface IEnvironment {
   tester: ITestIterator
