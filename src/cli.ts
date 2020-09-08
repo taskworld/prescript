@@ -144,9 +144,13 @@ function runDevelopmentMode(
   loadTest()
   tester.begin()
   let canceled = false
+  const onBeforeRunListeners = new Set<() => void>()
 
   ui.developmentModeStarted({
     tester,
+    onBeforeActionRun(fn) {
+      onBeforeRunListeners.add(fn)
+    },
     getState() {
       return state
     },
@@ -224,6 +228,9 @@ function runDevelopmentMode(
   async function runNextStep() {
     let error
     const stepNumber = tester.getCurrentStepNumber()
+    for (const fn of onBeforeRunListeners) {
+      fn()
+    }
     await runNext(tester, config, state, e => {
       error = e
     })

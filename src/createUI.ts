@@ -52,6 +52,9 @@ function startInteractiveMode(environment: IEnvironment): IInteractiveMode {
   const notifyStateChanged = () => {
     for (const fn of stateChangeListeners) fn()
   }
+  environment.onBeforeActionRun(() => {
+    notifyStateChanged()
+  })
 
   console.log(chalk.bold.yellow('## Entering development mode...'))
   console.log('Welcome to prescript development mode.')
@@ -209,7 +212,6 @@ function startInteractiveMode(environment: IEnvironment): IInteractiveMode {
   function handleRun(promise, callback) {
     const currentRun = { running: true }
     latestRun = currentRun
-    notifyStateChanged()
     return promise.then(
       () => {
         currentRun.running = false
@@ -288,6 +290,7 @@ function connectToExternalUI(
       const data = JSON.parse(raw.toString())
       if (data.run) {
         try {
+          console.log(chalk.cyan(data.run.command))
           await interactiveMode.run(data.run.command)
           client.send(
             JSON.stringify({ ack: { ackId: data.run.ackId, error: null } })
@@ -318,6 +321,7 @@ interface IInteractiveState {}
 
 interface IEnvironment {
   tester: ITestIterator
+  onBeforeActionRun(fn: () => void): void
   getState(): Prescript.GlobalState
   getCurrentStepNumber(): string | null
   getCurrentStep(): IStep
