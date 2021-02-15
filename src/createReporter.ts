@@ -47,6 +47,11 @@ export default function createReporter(testModulePath, rootStepName) {
   test.addLabel(LabelName.THREAD, `${process.pid}`)
   test.addLabel(LabelName.HOST, `${hostname()}`)
   test.addLabel(LabelName.FRAMEWORK, `prescript@${prescriptVersion}`)
+  for (const [key, value] of Object.entries(process.env)) {
+    if (key.startsWith('ALLURE_ENV_') && value) {
+      test.addParameter(key, value)
+    }
+  }
   let stack: IStepStack = new TestStepStack(test)
   singletonAllureInstance.currentReportingInterface = {
     addAttachment: (name, buf, mimeType) => {
