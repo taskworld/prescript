@@ -3,7 +3,7 @@
   "version": "0.55555555.0-55",
   "description": "Object-oriented acceptance test tool",
   "main": "./lib/singletonApi.js",
-  "typings": "./lib/singletonApi.d.ts",
+  "types": "./api/prescript.d.ts",
   "author": "Thai Pangsakulyanont <thai.p@taskworld.com>",
   "license": "MIT",
   "files": [
