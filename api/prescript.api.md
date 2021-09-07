@@ -68,7 +68,7 @@ export interface IConfig {
 export function independent<X>(f: () => X): X;
 
 // @public
-export function isPendingError(e: any): any;
+export function isPendingError(e: any): boolean;
 
 // @alpha (undocumented)
 export interface IStep {
@@ -104,8 +104,8 @@ export interface ITestExecutionContext {
 
 // @alpha (undocumented)
 export interface ITestReporter {
-    onEnterStep(node: IStep): void;
-    onExitStep(node: IStep, error?: Error): void;
+    onEnterStep(step: IStep): void;
+    onExitStep(step: IStep, error?: Error): void;
     onFinish(errors: Error[]): void;
 }
 

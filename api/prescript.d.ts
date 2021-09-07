@@ -129,8 +129,9 @@ export declare function independent<X>(f: () => X): X;
  * thrown by the `pending()` step.
  *
  * @param e - The error to check.
+ * @public
  */
-export declare function isPendingError(e: any): any;
+export declare function isPendingError(e: any): boolean;
 
 /**
  * @alpha
@@ -176,16 +177,23 @@ export declare interface ITestExecutionContext {
 export declare interface ITestReporter {
     /**
      * Called when the test is finished.
+     * @param errors - Errors that occurred during the test.
+     *  If there are no errors, this will be an empty array.
+     *  Note that pending tests are treated the same way as errors.
+     *  To check if an error object represents a pending test, use the {@link isPendingError} function.
      */
     onFinish(errors: Error[]): void;
     /**
      * Called when the test step is being entered.
+     * @param step - The test step that is being entered.
      */
-    onEnterStep(node: IStep): void;
+    onEnterStep(step: IStep): void;
     /**
      * Called when the test step is being exited.
+     * @param step - The test step that is being exited.
+     * @param error - The error that occurred during the test step.
      */
-    onExitStep(node: IStep, error?: Error): void;
+    onExitStep(step: IStep, error?: Error): void;
 }
 
 /**
