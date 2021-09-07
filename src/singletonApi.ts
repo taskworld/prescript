@@ -4,8 +4,11 @@
  */
 
 import currentActionContext from './currentActionContext'
+import { isPendingError } from './PendingError'
 import { getInstance } from './singleton'
 import { ActionFunction, StepDefName } from './types'
+
+export { isPendingError } from './PendingError'
 export { StepName } from './StepName'
 export {
   ActionFunction,
@@ -213,5 +216,6 @@ export default {
   onFinish,
   getCurrentState,
   getCurrentContext,
-  getCurrentPrescriptionState
+  getCurrentPrescriptionState,
+  isPendingError
 }
