@@ -1,3 +1,8 @@
+/**
+ * Acceptance test tool.
+ * @packageDocumentation
+ */
+
 /// <reference types="node" />
 
 /**
@@ -19,8 +24,14 @@ export declare function action(nameParts: TemplateStringsArray, ...substitutions
  */
 export declare function action(f: ActionFunction): void;
 
+/**
+ * @public
+ */
 export declare type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
+/**
+ * @public
+ */
 export declare type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
 /**
@@ -101,6 +112,9 @@ export declare interface IConfig {
  */
 export declare function independent<X>(f: () => X): X;
 
+/**
+ * @internal
+ */
 export declare interface IStep {
     name: StepName;
     number?: string;
@@ -115,6 +129,9 @@ export declare interface IStep {
     defer?: boolean;
 }
 
+/**
+ * @public
+ */
 export declare interface ITestExecutionContext {
     /**
      * This adds a log message to the current step.
@@ -155,8 +172,14 @@ export { pending_2 as pending }
  */
 export declare function step<X>(name: StepDefName, f: () => X): X;
 
+/**
+ * @internal
+ */
 export declare type StepDefName = StepName | string;
 
+/**
+ * @internal
+ */
 export declare class StepName {
     parts: string[];
     placeholders: string[];
@@ -177,6 +200,9 @@ declare function test_2<X>(name: string, f: () => X): X;
 declare function test_2(nameParts: TemplateStringsArray, ...substitutions: any[]): <X>(f: () => X) => X;
 export { test_2 as test }
 
+/**
+ * @public
+ */
 export declare interface Thenable {
     then(onFulfilled?: ((value: any) => any) | undefined | null, onRejected?: ((reason: any) => any) | undefined | null): Thenable;
 }

@@ -56,6 +56,9 @@ export function format(stepName: StepName | string, { colors = true } = {}) {
   return resultParts.join('')
 }
 
+/**
+ * @internal
+ */
 export class StepName {
   constructor(public parts: string[], public placeholders: string[]) {}
   toString() {

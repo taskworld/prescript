@@ -7,7 +7,8 @@
     "reportTempFolder": "<projectFolder>/tmp/api"
   },
   "docModel": {
-    "enabled": false
+    "enabled": true,
+    "apiJsonFilePath": "<projectFolder>/tmp/api/<unscopedPackageName>.api.json"
   },
   "dtsRollup": {
     "enabled": true,

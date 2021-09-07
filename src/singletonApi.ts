@@ -1,3 +1,8 @@
+/**
+ * Acceptance test tool.
+ * @packageDocumentation
+ */
+
 import { ActionFunction, StepDefName } from './types'
 import currentActionContext from './currentActionContext'
 export {
@@ -11,11 +16,6 @@ export {
 } from './types'
 export { StepName } from './StepName'
 import { getInstance } from './singleton'
-
-/**
- * Acceptance test tool.
- * @packageDocumentation
- */
 
 /**
  * Creates a Test.

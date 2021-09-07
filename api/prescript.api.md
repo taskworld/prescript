@@ -18,9 +18,13 @@ export function action(f: ActionFunction): void;
 // @public (undocumented)
 export type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
+// Warning: (ae-incompatible-release-tags) The symbol "ActionWrapper" is marked as @public, but its signature references "IStep" which is marked as @internal
+//
 // @public (undocumented)
 export type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
+// Warning: (ae-incompatible-release-tags) The symbol "cleanup" is marked as @public, but its signature references "StepDefName" which is marked as @internal
+//
 // @public @deprecated
 export function cleanup<X>(name: StepDefName, f: () => X): X;
 
@@ -63,7 +67,9 @@ export interface IConfig {
 // @public
 export function independent<X>(f: () => X): X;
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "IStep" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export interface IStep {
     // (undocumented)
     action?: ActionFunction;
@@ -102,13 +108,19 @@ export function onFinish(f: () => void): void;
 function pending_2(): void;
 export { pending_2 as pending }
 
+// Warning: (ae-incompatible-release-tags) The symbol "step" is marked as @public, but its signature references "StepDefName" which is marked as @internal
+//
 // @public @deprecated
 export function step<X>(name: StepDefName, f: () => X): X;
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "StepDefName" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export type StepDefName = StepName | string;
 
-// @public (undocumented)
+// Warning: (ae-internal-missing-underscore) The name "StepName" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal (undocumented)
 export class StepName {
     constructor(parts: string[], placeholders: string[]);
     // (undocumented)
@@ -137,7 +149,5 @@ export function to<X>(name: string, f: () => X): X;
 
 // @public
 export function to(nameParts: TemplateStringsArray, ...substitutions: any[]): <X>(f?: () => X) => X;
-
-// (No @packageDocumentation comment for this package)
 
 ```
