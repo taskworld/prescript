@@ -146,7 +146,7 @@ export interface ITestIterator {
   actionFailed(error: Error): void
 }
 
-interface Thenable {
+export interface Thenable {
   then(
     onFulfilled?: ((value: any) => any) | undefined | null,
     onRejected?: ((reason: any) => any) | undefined | null

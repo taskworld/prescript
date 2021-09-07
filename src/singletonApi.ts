@@ -5,8 +5,11 @@ export {
   ActionFunction,
   StepDefName,
   ITestExecutionContext,
-  ActionWrapper
+  ActionWrapper,
+  Thenable,
+  IStep
 } from './types'
+export { StepName } from './StepName'
 import { getInstance } from './singleton'
 
 /**
