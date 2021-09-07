@@ -1,7 +1,18 @@
 import { ActionFunction, StepDefName } from './types'
 import currentActionContext from './currentActionContext'
-export { IConfig } from './types'
-const { getInstance } = require('./singleton')
+export {
+  IConfig,
+  ActionFunction,
+  StepDefName,
+  ITestExecutionContext,
+  ActionWrapper
+} from './types'
+import { getInstance } from './singleton'
+
+/**
+ * Acceptance test tool.
+ * @packageDocumentation
+ */
 
 /**
  * Creates a Test.
