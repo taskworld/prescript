@@ -19,9 +19,9 @@ export declare function action(nameParts: TemplateStringsArray, ...substitutions
  */
 export declare function action(f: ActionFunction): void;
 
-declare type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
+export declare type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
-declare type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
+export declare type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
 /**
  * Deprecated.
@@ -115,7 +115,7 @@ declare interface IStep {
     defer?: boolean;
 }
 
-declare interface ITestExecutionContext {
+export declare interface ITestExecutionContext {
     /**
      * This adds a log message to the current step.
      * API is the same as `console.log()`.
@@ -155,7 +155,7 @@ export { pending_2 as pending }
  */
 export declare function step<X>(name: StepDefName, f: () => X): X;
 
-declare type StepDefName = StepName | string;
+export declare type StepDefName = StepName | string;
 
 declare class StepName {
     parts: string[];

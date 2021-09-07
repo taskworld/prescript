@@ -6,8 +6,6 @@
 
 /// <reference types="node" />
 
-// Warning: (ae-forgotten-export) The symbol "ActionFunction" needs to be exported by the entry point singletonApi.d.ts
-//
 // @public
 export function action(name: string, f: ActionFunction): void;
 
@@ -17,8 +15,16 @@ export function action(nameParts: TemplateStringsArray, ...substitutions: any[])
 // @public @deprecated
 export function action(f: ActionFunction): void;
 
-// Warning: (ae-forgotten-export) The symbol "StepDefName" needs to be exported by the entry point singletonApi.d.ts
+// Warning: (ae-forgotten-export) The symbol "Thenable" needs to be exported by the entry point singletonApi.d.ts
 //
+// @public (undocumented)
+export type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
+
+// Warning: (ae-forgotten-export) The symbol "IStep" needs to be exported by the entry point singletonApi.d.ts
+//
+// @public (undocumented)
+export type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
+
 // @public @deprecated
 export function cleanup<X>(name: StepDefName, f: () => X): X;
 
@@ -44,8 +50,6 @@ export function defer(name: string, f: ActionFunction): void;
 // @public
 export function defer(nameParts: TemplateStringsArray, ...substitutions: any[]): (f?: ActionFunction) => void;
 
-// Warning: (ae-forgotten-export) The symbol "ITestExecutionContext" needs to be exported by the entry point singletonApi.d.ts
-//
 // @public
 export function getCurrentContext(): ITestExecutionContext;
 
@@ -57,12 +61,17 @@ export function getCurrentState(): Prescript.GlobalState;
 
 // @public
 export interface IConfig {
-    // Warning: (ae-forgotten-export) The symbol "ActionWrapper" needs to be exported by the entry point singletonApi.d.ts
     wrapAction?: ActionWrapper;
 }
 
 // @public
 export function independent<X>(f: () => X): X;
+
+// @public (undocumented)
+export interface ITestExecutionContext {
+    attach(name: string, buffer: Buffer, mimeType: string): void;
+    log(format: any, ...args: any[]): void;
+}
 
 // @public @deprecated
 export function onFinish(f: () => void): void;
@@ -73,6 +82,11 @@ export { pending_2 as pending }
 
 // @public @deprecated
 export function step<X>(name: StepDefName, f: () => X): X;
+
+// Warning: (ae-forgotten-export) The symbol "StepName" needs to be exported by the entry point singletonApi.d.ts
+//
+// @public (undocumented)
+export type StepDefName = StepName | string;
 
 // @public
 function test_2<X>(name: string, f: () => X): X;
