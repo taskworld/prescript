@@ -163,13 +163,16 @@ export interface ITestReporter {
 
   /**
    * Called when the test step is being entered.
+   * @param step - The test step that is being entered.
    */
-  onEnterStep(node: IStep): void
+  onEnterStep(step: IStep): void
 
   /**
    * Called when the test step is being exited.
+   * @param step - The test step that is being exited.
+   * @param error - The error that occurred during the test step.
    */
-  onExitStep(node: IStep, error?: Error): void
+  onExitStep(step: IStep, error?: Error): void
 }
 
 export interface IVisitor {
