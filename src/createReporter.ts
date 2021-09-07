@@ -16,6 +16,7 @@ import { hostname } from 'os'
 import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 import { StepName } from './StepName'
 import { IStep, ITestReporter, IConfig } from './types'
+import { isPendingError } from './PendingError'
 
 class CompositeTestReporter implements ITestReporter {
   constructor(public reporters: ITestReporter[]) {}
@@ -149,7 +150,7 @@ const saveOutcome = (
     executableItem.stage = Stage.FINISHED
     return
   }
-  if ((outcome as any).__prescriptPending) {
+  if (isPendingError(outcome)) {
     executableItem.stage = Stage.FINISHED
     executableItem.status = Status.SKIPPED
     return

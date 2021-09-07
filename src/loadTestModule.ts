@@ -284,8 +284,7 @@ function loadTest(
       }
     },
     pending() {
-      const error = new Error('[pending]')
-      ;(error as any).__prescriptPending = true
+      const error = new PendingError()
       const definition = getSource(ErrorStackParser.parse(new Error(`Pending`)))
       return appendStep(
         { name: StepName.coerce('Pending'), definition, pending: true },

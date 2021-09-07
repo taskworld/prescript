@@ -25,6 +25,7 @@ import cosmiconfig from 'cosmiconfig'
 import { resolveConfig, ResolvedConfig } from './configuration'
 import singletonAllureInstance from './singletonAllureInstance'
 import currentActionContext from './currentActionContext'
+import { isPendingError } from './PendingError'
 
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
@@ -308,7 +309,7 @@ function runNonInteractiveMode(
     const timeTaken = Date.now() - started
     const formattedTimeTaken = chalk.dim(ms(timeTaken))
     if (errors.length) {
-      if (errors.every(e => (e as any).__prescriptPending)) {
+      if (errors.every(e => isPendingError(e))) {
         console.log(chalk.bold.yellow('Test pending'), formattedTimeTaken)
         process.exitCode = 2
       } else {
@@ -405,7 +406,7 @@ async function runNext(
     const definition =
       'Hint: Here is where this action has been defined:\n    at ' +
       step.actionDefinition
-    if (e.__prescriptPending) {
+    if (isPendingError(e)) {
       console.log('\b\b\b', chalk.bold.cyan('PENDING'), formatTimeTaken())
       console.log(
         chalk.cyan(
