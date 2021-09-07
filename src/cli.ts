@@ -287,7 +287,11 @@ function runNonInteractiveMode(
   )
 
   async function runTest() {
-    const reporter = createReporter(testModulePath, tests[0].name)
+    const reporter = createReporter(
+      testModulePath,
+      tests[0].name,
+      config.createTestReporter
+    )
     const iterationListener: IIterationListener = {
       onEnter: node => reporter.onEnterStep(node),
       onExit: (node, error) => reporter.onExitStep(node, error)

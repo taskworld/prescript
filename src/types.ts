@@ -12,7 +12,7 @@ declare global {
 }
 
 /**
- * @internal
+ * @public
  */
 export type StepDefName = StepName | string
 
@@ -30,12 +30,24 @@ export interface IConfig {
    * - Enhance the error message / stack trace.
    * - Benchmarking and profiling.
    * - etc.
+   *
+   * @alpha
    */
   wrapAction?: ActionWrapper
+
+  /**
+   * Create a custom test reporter.
+   * @remarks
+   * It is very important that the reporter do not throw an error.
+   * Otherwise, the behavior of prescript is undefined.
+   * @param testModulePath - The path of the test file.
+   * @alpha
+   */
+  createTestReporter?(testModulePath: string, testName: string): ITestReporter
 }
 
 /**
- * @public
+ * @alpha
  */
 export type ActionWrapper = (
   step: IStep,
@@ -45,7 +57,7 @@ export type ActionWrapper = (
 ) => Promise<void>
 
 /**
- * @internal
+ * @alpha
  */
 export interface IStep {
   name: StepName
@@ -136,10 +148,24 @@ export interface IIterationListener {
   onExit: (node: IStep, error?: Error) => void
 }
 
+/**
+ * @alpha
+ */
 export interface ITestReporter {
-  onFinish: (errors: Error[]) => void
-  onEnterStep: IIterationListener['onEnter']
-  onExitStep: IIterationListener['onExit']
+  /**
+   * Called when the test is finished.
+   */
+  onFinish(errors: Error[]): void
+
+  /**
+   * Called when the test step is being entered.
+   */
+  onEnterStep(node: IStep): void
+
+  /**
+   * Called when the test step is being exited.
+   */
+  onExitStep(node: IStep, error?: Error): void
 }
 
 export interface IVisitor {

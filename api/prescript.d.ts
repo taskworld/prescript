@@ -30,7 +30,7 @@ export declare function action(f: ActionFunction): void;
 export declare type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
 /**
- * @public
+ * @alpha
  */
 export declare type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
@@ -102,8 +102,19 @@ export declare interface IConfig {
      * - Enhance the error message / stack trace.
      * - Benchmarking and profiling.
      * - etc.
+     *
+     * @alpha
      */
     wrapAction?: ActionWrapper;
+    /**
+     * Create a custom test reporter.
+     * @remarks
+     * It is very important that the reporter do not throw an error.
+     * Otherwise, the behavior of prescript is undefined.
+     * @param testModulePath - The path of the test file.
+     * @alpha
+     */
+    createTestReporter?(testModulePath: string, testName: string): ITestReporter;
 }
 
 /**
@@ -113,7 +124,7 @@ export declare interface IConfig {
 export declare function independent<X>(f: () => X): X;
 
 /**
- * @internal
+ * @alpha
  */
 export declare interface IStep {
     name: StepName;
@@ -151,6 +162,24 @@ export declare interface ITestExecutionContext {
 }
 
 /**
+ * @alpha
+ */
+export declare interface ITestReporter {
+    /**
+     * Called when the test is finished.
+     */
+    onFinish(errors: Error[]): void;
+    /**
+     * Called when the test step is being entered.
+     */
+    onEnterStep(node: IStep): void;
+    /**
+     * Called when the test step is being exited.
+     */
+    onExitStep(node: IStep, error?: Error): void;
+}
+
+/**
  * Deprecated.
  * @public
  * @deprecated Use `defer()` instead.
@@ -173,16 +202,19 @@ export { pending_2 as pending }
 export declare function step<X>(name: StepDefName, f: () => X): X;
 
 /**
- * @internal
+ * @public
  */
 export declare type StepDefName = StepName | string;
 
 /**
- * @internal
+ * @public
  */
 export declare class StepName {
     parts: string[];
     placeholders: string[];
+    /**
+     * @internal
+     */
     constructor(parts: string[], placeholders: string[]);
     toString(): string;
 }

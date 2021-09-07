@@ -3,19 +3,20 @@
  * @packageDocumentation
  */
 
-import { ActionFunction, StepDefName } from './types'
 import currentActionContext from './currentActionContext'
-export {
-  IConfig,
-  ActionFunction,
-  StepDefName,
-  ITestExecutionContext,
-  ActionWrapper,
-  Thenable,
-  IStep
-} from './types'
-export { StepName } from './StepName'
 import { getInstance } from './singleton'
+import { ActionFunction, StepDefName } from './types'
+export { StepName } from './StepName'
+export {
+  ActionFunction,
+  ActionWrapper,
+  IConfig,
+  IStep,
+  ITestExecutionContext,
+  ITestReporter,
+  StepDefName,
+  Thenable
+} from './types'
 
 /**
  * Creates a Test.

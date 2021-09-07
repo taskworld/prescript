@@ -15,7 +15,7 @@ import {
 import { hostname } from 'os'
 import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 import { StepName } from './StepName'
-import { IStep, ITestReporter } from './types'
+import { IStep, ITestReporter, IConfig } from './types'
 
 class CompositeTestReporter implements ITestReporter {
   constructor(public reporters: ITestReporter[]) {}
@@ -101,7 +101,8 @@ class AllureTestReporter implements ITestReporter {
 
 export default function createReporter(
   testModulePath: string,
-  rootStepName: StepName
+  rootStepName: StepName,
+  customTestReporterFactory: IConfig['createTestReporter']
 ): ITestReporter {
   const reporters: ITestReporter[] = []
 
@@ -120,6 +121,12 @@ export default function createReporter(
     const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
     const resultsDir = process.env.ALLURE_RESULTS_DIR || 'allure-results'
     reporters.push(new AllureTestReporter({ suiteName, caseName, resultsDir }))
+  }
+
+  if (customTestReporterFactory) {
+    reporters.push(
+      customTestReporterFactory(testModulePath, String(rootStepName))
+    )
   }
 
   return new CompositeTestReporter(reporters)
