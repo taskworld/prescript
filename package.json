@@ -25,6 +25,7 @@
     "vorpal": "^1.11.4"
   },
   "devDependencies": {
+    "@microsoft/api-documenter": "^7.13.44",
     "@microsoft/api-extractor": "^7.18.7",
     "@types/indent-string": "^3.0.0",
     "@types/invariant": "^2.2.29",

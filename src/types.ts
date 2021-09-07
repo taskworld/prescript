@@ -11,6 +11,9 @@ declare global {
   }
 }
 
+/**
+ * @internal
+ */
 export type StepDefName = StepName | string
 
 /**
@@ -31,6 +34,9 @@ export interface IConfig {
   wrapAction?: ActionWrapper
 }
 
+/**
+ * @public
+ */
 export type ActionWrapper = (
   step: IStep,
   execute: () => Promise<void>,
@@ -38,6 +44,9 @@ export type ActionWrapper = (
   context: ITestExecutionContext
 ) => Promise<void>
 
+/**
+ * @internal
+ */
 export interface IStep {
   name: StepName
   number?: string
@@ -100,6 +109,9 @@ export interface IPrescriptAPI {
   use(f: (api: IPrescriptAPI) => void): void
 }
 
+/**
+ * @public
+ */
 export interface ITestExecutionContext {
   /**
    * This adds a log message to the current step.
@@ -146,6 +158,9 @@ export interface ITestIterator {
   actionFailed(error: Error): void
 }
 
+/**
+ * @public
+ */
 export interface Thenable {
   then(
     onFulfilled?: ((value: any) => any) | undefined | null,
@@ -153,6 +168,9 @@ export interface Thenable {
   ): Thenable
 }
 
+/**
+ * @public
+ */
 export type ActionFunction = (
   state: Prescript.GlobalState,
   context: ITestExecutionContext
