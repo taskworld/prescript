@@ -101,7 +101,7 @@ export declare interface IConfig {
  */
 export declare function independent<X>(f: () => X): X;
 
-declare interface IStep {
+export declare interface IStep {
     name: StepName;
     number?: string;
     children?: IStep[];
@@ -157,7 +157,7 @@ export declare function step<X>(name: StepDefName, f: () => X): X;
 
 export declare type StepDefName = StepName | string;
 
-declare class StepName {
+export declare class StepName {
     parts: string[];
     placeholders: string[];
     constructor(parts: string[], placeholders: string[]);
@@ -177,7 +177,7 @@ declare function test_2<X>(name: string, f: () => X): X;
 declare function test_2(nameParts: TemplateStringsArray, ...substitutions: any[]): <X>(f: () => X) => X;
 export { test_2 as test }
 
-declare interface Thenable {
+export declare interface Thenable {
     then(onFulfilled?: ((value: any) => any) | undefined | null, onRejected?: ((reason: any) => any) | undefined | null): Thenable;
 }
 

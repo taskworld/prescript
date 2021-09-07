@@ -15,13 +15,9 @@ export function action(nameParts: TemplateStringsArray, ...substitutions: any[])
 // @public @deprecated
 export function action(f: ActionFunction): void;
 
-// Warning: (ae-forgotten-export) The symbol "Thenable" needs to be exported by the entry point singletonApi.d.ts
-//
 // @public (undocumented)
 export type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
-// Warning: (ae-forgotten-export) The symbol "IStep" needs to be exported by the entry point singletonApi.d.ts
-//
 // @public (undocumented)
 export type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
@@ -68,6 +64,32 @@ export interface IConfig {
 export function independent<X>(f: () => X): X;
 
 // @public (undocumented)
+export interface IStep {
+    // (undocumented)
+    action?: ActionFunction;
+    // (undocumented)
+    actionDefinition?: string;
+    // (undocumented)
+    children?: IStep[];
+    // (undocumented)
+    cleanup?: boolean;
+    // (undocumented)
+    creator?: string;
+    // (undocumented)
+    defer?: boolean;
+    // (undocumented)
+    definition?: string;
+    // (undocumented)
+    independent?: boolean;
+    // (undocumented)
+    name: StepName;
+    // (undocumented)
+    number?: string;
+    // (undocumented)
+    pending?: boolean;
+}
+
+// @public (undocumented)
 export interface ITestExecutionContext {
     attach(name: string, buffer: Buffer, mimeType: string): void;
     log(format: any, ...args: any[]): void;
@@ -83,10 +105,19 @@ export { pending_2 as pending }
 // @public @deprecated
 export function step<X>(name: StepDefName, f: () => X): X;
 
-// Warning: (ae-forgotten-export) The symbol "StepName" needs to be exported by the entry point singletonApi.d.ts
-//
 // @public (undocumented)
 export type StepDefName = StepName | string;
+
+// @public (undocumented)
+export class StepName {
+    constructor(parts: string[], placeholders: string[]);
+    // (undocumented)
+    parts: string[];
+    // (undocumented)
+    placeholders: string[];
+    // (undocumented)
+    toString(): string;
+}
 
 // @public
 function test_2<X>(name: string, f: () => X): X;
@@ -94,6 +125,12 @@ function test_2<X>(name: string, f: () => X): X;
 // @public
 function test_2(nameParts: TemplateStringsArray, ...substitutions: any[]): <X>(f: () => X) => X;
 export { test_2 as test }
+
+// @public (undocumented)
+export interface Thenable {
+    // (undocumented)
+    then(onFulfilled?: ((value: any) => any) | undefined | null, onRejected?: ((reason: any) => any) | undefined | null): Thenable;
+}
 
 // @public
 export function to<X>(name: string, f: () => X): X;
