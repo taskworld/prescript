@@ -106,8 +106,14 @@ export interface ITestExecutionContext {
 }
 
 export interface IIterationListener {
-  onEnter(node: IStep)
-  onExit(node: IStep, error?: Error)
+  onEnter: (node: IStep) => void
+  onExit: (node: IStep, error?: Error) => void
+}
+
+export interface ITestReporter {
+  onFinish: (errors: Error[]) => void
+  onEnterStep: IIterationListener['onEnter']
+  onExitStep: IIterationListener['onExit']
 }
 
 export interface IVisitor {

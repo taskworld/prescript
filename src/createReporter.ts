@@ -9,26 +9,99 @@ import {
   AllureStep,
   Stage,
   Status,
-  LabelName
+  LabelName,
+  AllureGroup
 } from 'allure-js-commons'
 import { hostname } from 'os'
 import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 import { StepName } from './StepName'
-import { IIterationListener } from './types'
+import { IStep, ITestReporter } from './types'
+
+class NullTestReporter implements ITestReporter {
+  onFinish() {}
+  onEnterStep() {}
+  onExitStep() {}
+}
+
+class AllureTestReporter implements ITestReporter {
+  private _stack: IStepStack
+  private _group: AllureGroup
+
+  constructor({
+    suiteName,
+    caseName,
+    resultsDir
+  }: {
+    suiteName: string
+    caseName: string
+    resultsDir: string
+  }) {
+    const historyId = createHash('md5')
+      .update([suiteName, caseName].join(' / '))
+      .digest('hex')
+
+    const allureConfig: IAllureConfig = { resultsDir }
+    const writer = new AllureWriter(allureConfig)
+    const runtime = new AllureRuntime({ ...allureConfig, writer })
+    const group = runtime.startGroup(suiteName)
+    const test = group.startTest(caseName)
+    const prescriptVersion = require('../package').version
+    test.historyId = historyId
+    test.addLabel(LabelName.THREAD, `${process.pid}`)
+    test.addLabel(LabelName.HOST, `${hostname()}`)
+    test.addLabel(LabelName.FRAMEWORK, `prescript@${prescriptVersion}`)
+    for (const [key, value] of Object.entries(process.env)) {
+      if (key.startsWith('ALLURE_ENV_') && value) {
+        test.addParameter(key, value)
+      }
+    }
+
+    this._stack = new TestStepStack(test)
+    this._group = group
+    singletonAllureInstance.currentReportingInterface = {
+      addAttachment: (name, buf, mimeType) => {
+        const sha = createHash('sha256')
+          .update(buf)
+          .digest('hex')
+        const fileName = sha + path.extname(name)
+        writer.writeAttachment(fileName, buf)
+        this._stack
+          .getExecutableItem()
+          .addAttachment(name, mimeType as any, fileName)
+      }
+    }
+  }
+
+  onEnterStep(node: IStep) {
+    if (!node.number) {
+      return
+    }
+    this._stack = this._stack.push(String(node.name))
+  }
+
+  onExitStep(node: IStep, error?: Error) {
+    if (!node.number) {
+      return
+    }
+    this._stack = this._stack.pop(error)
+  }
+
+  onFinish(errors: Error[]) {
+    this._stack = this._stack.pop(errors[0])
+    this._group.endGroup()
+  }
+}
 
 export default function createReporter(
   testModulePath: string,
   rootStepName: StepName
-): {
-  onFinish: (errors: Error[]) => void
-  iterationListener: Partial<IIterationListener>
-} {
+): ITestReporter {
   if (
     !process.env.ALLURE_SUITE_NAME &&
     !process.env.ALLURE_RESULTS_DIR &&
     !process.env.ALLURE_CASE_NAME
   ) {
-    return { onFinish: () => {}, iterationListener: {} }
+    return new NullTestReporter()
   }
 
   const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
@@ -39,58 +112,8 @@ export default function createReporter(
     return `${testPath}${testName ? ` - ${testName}` : ''}`
   }
   const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
-  const historyId = createHash('md5')
-    .update([suiteName, caseName].join(' / '))
-    .digest('hex')
-
-  const allureConfig: IAllureConfig = {
-    resultsDir: process.env.ALLURE_RESULTS_DIR || 'allure-results'
-  }
-  const writer = new AllureWriter(allureConfig)
-  const runtime = new AllureRuntime({ ...allureConfig, writer })
-  const group = runtime.startGroup(suiteName)
-  const test = group.startTest(caseName)
-  const prescriptVersion = require('../package').version
-  test.historyId = historyId
-  test.addLabel(LabelName.THREAD, `${process.pid}`)
-  test.addLabel(LabelName.HOST, `${hostname()}`)
-  test.addLabel(LabelName.FRAMEWORK, `prescript@${prescriptVersion}`)
-  for (const [key, value] of Object.entries(process.env)) {
-    if (key.startsWith('ALLURE_ENV_') && value) {
-      test.addParameter(key, value)
-    }
-  }
-  let stack: IStepStack = new TestStepStack(test)
-  singletonAllureInstance.currentReportingInterface = {
-    addAttachment: (name, buf, mimeType) => {
-      const sha = createHash('sha256')
-        .update(buf)
-        .digest('hex')
-      const fileName = sha + path.extname(name)
-      writer.writeAttachment(fileName, buf)
-      stack.getExecutableItem().addAttachment(name, mimeType as any, fileName)
-    }
-  }
-  return {
-    iterationListener: {
-      onEnter(node) {
-        if (!node.number) {
-          return
-        }
-        stack = stack.push(String(node.name))
-      },
-      onExit(node, error) {
-        if (!node.number) {
-          return
-        }
-        stack = stack.pop(error)
-      }
-    },
-    onFinish(errors: Error[]) {
-      stack = stack.pop(errors[0])
-      group.endGroup()
-    }
-  }
+  const resultsDir = process.env.ALLURE_RESULTS_DIR || 'allure-results'
+  return new AllureTestReporter({ suiteName, caseName, resultsDir })
 }
 
 type Outcome = Error | undefined
