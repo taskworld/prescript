@@ -14,5 +14,5 @@ export class PendingError extends Error {
  * @param e - The error to check.
  */
 export function isPendingError(e: any) {
-  return e && e.__prescriptPending
+  return !!(e && e.__prescriptPending)
 }
