@@ -39,7 +39,7 @@ E2E tests usually take quite a long time to run (compared to unit tests).
 To be scalable, we need to think about running these tests in parallel.
 
 prescript’s philosophy is **“1 test = 1 file.”** This makes it very easy to
-distribute tests across multiple machines. We at Taskworld run about 16 tests
+distribute tests across multiple machines. We at Taskworld run about 36 tests
 simultaneously.
 
 ::: tip NOTE
