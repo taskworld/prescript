@@ -37,6 +37,7 @@ const _default: {
     getCurrentState: typeof getCurrentState;
     getCurrentContext: typeof getCurrentContext;
     getCurrentPrescriptionState: typeof getCurrentPrescriptionState;
+    isPendingError: typeof isPendingError;
 };
 export default _default;
 
@@ -65,6 +66,9 @@ export interface IConfig {
 
 // @public
 export function independent<X>(f: () => X): X;
+
+// @public
+export function isPendingError(e: any): any;
 
 // @alpha (undocumented)
 export interface IStep {

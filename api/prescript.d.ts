@@ -53,6 +53,7 @@ declare const _default: {
     getCurrentState: typeof getCurrentState;
     getCurrentContext: typeof getCurrentContext;
     getCurrentPrescriptionState: typeof getCurrentPrescriptionState;
+    isPendingError: typeof isPendingError;
 };
 export default _default;
 
@@ -122,6 +123,14 @@ export declare interface IConfig {
  * @public
  */
 export declare function independent<X>(f: () => X): X;
+
+/**
+ * Checks if the provided Error object is a PendingError, which is
+ * thrown by the `pending()` step.
+ *
+ * @param e - The error to check.
+ */
+export declare function isPendingError(e: any): any;
 
 /**
  * @alpha
