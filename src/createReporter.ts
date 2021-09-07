@@ -17,10 +17,17 @@ import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 import { StepName } from './StepName'
 import { IStep, ITestReporter } from './types'
 
-class NullTestReporter implements ITestReporter {
-  onFinish() {}
-  onEnterStep() {}
-  onExitStep() {}
+class CompositeTestReporter implements ITestReporter {
+  constructor(public reporters: ITestReporter[]) {}
+  onFinish(errors: Error[]) {
+    this.reporters.forEach(reporter => reporter.onFinish(errors))
+  }
+  onEnterStep(step: IStep) {
+    this.reporters.forEach(reporter => reporter.onEnterStep(step))
+  }
+  onExitStep(step: IStep, error?: Error) {
+    this.reporters.forEach(reporter => reporter.onExitStep(step, error))
+  }
 }
 
 class AllureTestReporter implements ITestReporter {
@@ -96,24 +103,26 @@ export default function createReporter(
   testModulePath: string,
   rootStepName: StepName
 ): ITestReporter {
+  const reporters: ITestReporter[] = []
+
   if (
-    !process.env.ALLURE_SUITE_NAME &&
-    !process.env.ALLURE_RESULTS_DIR &&
-    !process.env.ALLURE_CASE_NAME
+    process.env.ALLURE_SUITE_NAME ||
+    process.env.ALLURE_RESULTS_DIR ||
+    process.env.ALLURE_CASE_NAME
   ) {
-    return new NullTestReporter()
+    const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
+    const getDefaultCaseName = () => {
+      const testPath = path.relative(process.cwd(), testModulePath)
+      const rawTestName = String(rootStepName)
+      const testName = rawTestName === '[implicit test]' ? '' : rawTestName
+      return `${testPath}${testName ? ` - ${testName}` : ''}`
+    }
+    const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
+    const resultsDir = process.env.ALLURE_RESULTS_DIR || 'allure-results'
+    reporters.push(new AllureTestReporter({ suiteName, caseName, resultsDir }))
   }
 
-  const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
-  const getDefaultCaseName = () => {
-    const testPath = path.relative(process.cwd(), testModulePath)
-    const rawTestName = String(rootStepName)
-    const testName = rawTestName === '[implicit test]' ? '' : rawTestName
-    return `${testPath}${testName ? ` - ${testName}` : ''}`
-  }
-  const caseName = process.env.ALLURE_CASE_NAME || getDefaultCaseName()
-  const resultsDir = process.env.ALLURE_RESULTS_DIR || 'allure-results'
-  return new AllureTestReporter({ suiteName, caseName, resultsDir })
+  return new CompositeTestReporter(reporters)
 }
 
 type Outcome = Error | undefined
