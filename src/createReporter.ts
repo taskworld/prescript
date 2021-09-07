@@ -13,14 +13,22 @@ import {
 } from 'allure-js-commons'
 import { hostname } from 'os'
 import { AllureWriter } from 'allure-js-commons/dist/src/writers'
+import { StepName } from './StepName'
+import { IIterationListener } from './types'
 
-export default function createReporter(testModulePath, rootStepName) {
+export default function createReporter(
+  testModulePath: string,
+  rootStepName: StepName
+): {
+  onFinish: (errors: Error[]) => void
+  iterationListener: Partial<IIterationListener>
+} {
   if (
     !process.env.ALLURE_SUITE_NAME &&
     !process.env.ALLURE_RESULTS_DIR &&
     !process.env.ALLURE_CASE_NAME
   ) {
-    return { onFinish(errors: Error[]) {}, iterationListener: {} }
+    return { onFinish: () => {}, iterationListener: {} }
   }
 
   const suiteName = process.env.ALLURE_SUITE_NAME || 'prescript'
