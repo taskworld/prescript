@@ -154,6 +154,10 @@ export interface IIterationListener {
 export interface ITestReporter {
   /**
    * Called when the test is finished.
+   * @param errors - Errors that occurred during the test.
+   *  If there are no errors, this will be an empty array.
+   *  Note that pending tests are treated the same way as errors.
+   *  To check if an error object represents a pending test, use the {@link isPendingError} function.
    */
   onFinish(errors: Error[]): void
 

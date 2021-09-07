@@ -1,3 +1,7 @@
+/**
+ * This error is thrown by prescript when a `pending()` step is executed.
+ * @public
+ */
 export class PendingError extends Error {
   public __prescriptPending = true
 
@@ -12,6 +16,7 @@ export class PendingError extends Error {
  * thrown by the `pending()` step.
  *
  * @param e - The error to check.
+ * @public
  */
 export function isPendingError(e: any) {
   return !!(e && e.__prescriptPending)
