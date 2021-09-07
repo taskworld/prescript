@@ -13,7 +13,21 @@ declare global {
 
 export type StepDefName = StepName | string
 
+/**
+ * Configuration defined in the `prescript.config.js` file.
+ * For more information, see the {@link https://taskworld.github.io/prescript/guide/config.html | advanced configuration guide}.
+ * @public
+ */
 export interface IConfig {
+  /**
+   * You can setup an action wrapper that will wrap all action steps. It is like a middleware.
+   *
+   * @remarks
+   * It can be used for various purposes:
+   * - Enhance the error message / stack trace.
+   * - Benchmarking and profiling.
+   * - etc.
+   */
   wrapAction?: ActionWrapper
 }
 
@@ -91,16 +105,16 @@ export interface ITestExecutionContext {
    * This adds a log message to the current step.
    * API is the same as `console.log()`.
    * Use this function instead of `console.log()` to not clutter the console output.
-   * @param format Format string, like `console.log()`
-   * @param args Arguments to be formatted.
+   * @param format - Format string, like `console.log()`
+   * @param args - Arguments to be formatted.
    */
   log(format: any, ...args: any[]): void
 
   /**
    * This adds an attachment to the current step, such as screenshot, JSON result, etc.
-   * @param name Name of the attachment
-   * @param buffer Attachment content
-   * @param mimeType MIME type of the attachment (image/jpeg, text/plain, application/json...)
+   * @param name - Name of the attachment
+   * @param buffer - Attachment content
+   * @param mimeType - MIME type of the attachment (image/jpeg, text/plain, application/json...)
    */
   attach(name: string, buffer: Buffer, mimeType: string): void
 }
