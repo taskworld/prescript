@@ -15,7 +15,8 @@ import {
   ITestIterator,
   IStep,
   ITestLoadLogger,
-  ITestExecutionContext
+  ITestExecutionContext,
+  IIterationListener
 } from './types'
 import { StepName } from './StepName'
 import { createConsoleLogger } from './loadTestModule'
@@ -287,10 +288,11 @@ function runNonInteractiveMode(
 
   async function runTest() {
     const reporter = createReporter(testModulePath, tests[0].name)
-    const tester = createTestIterator(
-      createLogVisitor(),
-      reporter.iterationListener
-    )
+    const iterationListener: IIterationListener = {
+      onEnter: node => reporter.onEnterStep(node),
+      onExit: (node, error) => reporter.onExitStep(node, error)
+    }
+    const tester = createTestIterator(createLogVisitor(), iterationListener)
     const errors: Error[] = []
     const started = Date.now()
     tester.setTest(tests[0])

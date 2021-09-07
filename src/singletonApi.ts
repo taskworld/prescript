@@ -1,55 +1,71 @@
 import { ActionFunction, StepDefName } from './types'
 import currentActionContext from './currentActionContext'
-export { IConfig } from './types'
-const { getInstance } = require('./singleton')
+export {
+  IConfig,
+  ActionFunction,
+  StepDefName,
+  ITestExecutionContext,
+  ActionWrapper,
+  Thenable,
+  IStep
+} from './types'
+export { StepName } from './StepName'
+import { getInstance } from './singleton'
+
+/**
+ * Acceptance test tool.
+ * @packageDocumentation
+ */
 
 /**
  * Creates a Test.
+ * @public
  */
 export function test<X>(name: string, f: () => X): X
 
 /**
  * Creates a Test.
+ * @public
  */
 export function test(
   nameParts: TemplateStringsArray,
   ...substitutions: any[]
 ): <X>(f: () => X) => X
 
-/**
- * Creates a Test.
- */
+// Implementation
 export function test(...args) {
   return getInstance().test(...args)
 }
 
 /**
  * Creates a Compound Test Step, which can contain child steps.
+ * @public
  */
 export function to<X>(name: string, f: () => X): X
 
 /**
  * Creates a Compound Test Step, which can contain child steps.
+ * @public
  */
 export function to(
   nameParts: TemplateStringsArray,
   ...substitutions: any[]
 ): <X>(f?: () => X) => X
 
-/**
- * Creates a Compound Test Step, which can contain child steps.
- */
+// Implementation
 export function to(...args) {
   return getInstance().to(...args)
 }
 
 /**
  * Creates an Action Step to be performed at runtime.
+ * @public
  */
 export function action(name: string, f: ActionFunction): void
 
 /**
  * Creates an Action Step to be performed at runtime.
+ * @public
  */
 export function action(
   nameParts: TemplateStringsArray,
@@ -57,25 +73,26 @@ export function action(
 ): (f?: ActionFunction) => void
 
 /**
- * Makes the enclosing `step()` an Action Step.
- * @deprecated
+ * Deprecated: Makes the enclosing `step()` an Action Step.
+ * @public
+ * @deprecated Use `action(name, f)` or `action` template tag instead.
  */
 export function action(f: ActionFunction): void
 
-/**
- * Creates an Action Step to be performed at runtime.
- */
+// Implementation
 export function action(...args) {
   return getInstance().action(...args)
 }
 
 /**
  * Creates a Deferred Action Step, for, e.g., cleaning up resources.
+ * @public
  */
 export function defer(name: string, f: ActionFunction): void
 
 /**
  * Creates a Deferred Action Step, for, e.g., cleaning up resources.
+ * @public
  */
 export function defer(
   nameParts: TemplateStringsArray,
@@ -92,6 +109,7 @@ export function defer(...args) {
 /**
  * Creates a Pending step to make the test end with pending state.
  * Useful for unfinished tests.
+ * @public
  */
 export function pending(): void {
   getInstance().pending()
@@ -99,40 +117,56 @@ export function pending(): void {
 
 /**
  * Marks the steps inside as independent
+ * @public
  */
 export function independent<X>(f: () => X): X {
   return getInstance().independent(f)
 }
 
-/** @deprecated Use `to()` instead. */
+/**
+ * Deprecated.
+ * @public
+ * @deprecated Use `to()` instead.
+ */
 export function step<X>(name: StepDefName, f: () => X): X
 
-/** @deprecated Use `to()` instead. */
+/**
+ * Deprecated.
+ * @public
+ * @deprecated Use `to()` instead.
+ */
 export function step(...args) {
   return getInstance().step(...args)
 }
 
-/** @deprecated Use `defer()` instead. */
+/**
+ * Deprecated.
+ * @public
+ * @deprecated Use `defer()` instead.
+ */
 export function cleanup<X>(name: StepDefName, f: () => X): X
 
-/** @deprecated Use `defer()` instead. */
+// Implementation
 export function cleanup(...args) {
   return getInstance().cleanup(...args)
 }
 
-/** @deprecated Use `defer()` instead. */
+/**
+ * Deprecated.
+ * @public
+ * @deprecated Use `defer()` instead.
+ */
 export function onFinish(f: () => void): void
 
-/** @deprecated Use `defer()` instead. */
+// Implementation
 export function onFinish(...args) {
   return getInstance().onFinish(...args)
 }
 
-// The advanced API zone!
-
 /**
  * Returns the current state object.
  * This allows library functions to hook into prescript’s state.
+ * @public
  */
 export function getCurrentState() {
   if (!currentActionContext.current) {
@@ -144,6 +178,7 @@ export function getCurrentState() {
 /**
  * Returns the current action context object.
  * This allows library functions to hook into prescript’s current action context.
+ * @public
  */
 export function getCurrentContext() {
   if (!currentActionContext.current) {
@@ -156,7 +191,7 @@ const stateCache = new WeakMap<any, Prescript.PrescriptionState>()
 
 /**
  * Returns a state object that exists only during prescription phase for each test.
- * This is useful for libraries to implement, e.g.
+ * @public
  */
 export function getCurrentPrescriptionState() {
   const instance = getInstance()

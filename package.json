@@ -1,9 +1,9 @@
 {
   "name": "prescript",
-  "version": "0.55555555.0-5",
+  "version": "0.55555555.0-555",
   "description": "Object-oriented acceptance test tool",
   "main": "./lib/singletonApi.js",
-  "typings": "./lib/singletonApi.d.ts",
+  "types": "./api/prescript.d.ts",
   "author": "Thai Pangsakulyanont <thai.p@taskworld.com>",
   "license": "MIT",
   "files": [
@@ -25,6 +25,7 @@
     "vorpal": "^1.11.4"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.18.7",
     "@types/indent-string": "^3.0.0",
     "@types/invariant": "^2.2.29",
     "@types/jest": "^22.2.3",
