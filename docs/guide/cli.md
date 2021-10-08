@@ -59,6 +59,11 @@ Exit codes only apply to non-interactive mode
 | 2         | Pending test           |
 | 3         | Multiple tests defined |
 
+## `ALLURE_ENV_*` environment variables
+
+In the non-interactive mode, when you specify the `ALLURE_ENV_*` environment
+variables, they will be added to the test report files.
+
 ## Running multiple tests
 
 prescript **by design** only runs a single test. This allows prescript to remain

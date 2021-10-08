@@ -41,3 +41,7 @@ exports.wrapAction = async (step, execute, state, context) => {
   }
 }
 ```
+
+## `createTestReporter`
+
+This allows you to create a custom reporter for your test, enabling custom reporting and integration with e.g. [OpenTelemetry](https://opentelemetry.io/). For more information, see the [type definition](https://github.com/taskworld/prescript/blob/master/api/prescript.d.ts#:~:text=*/-,createTestReporter,-) and [example](https://github.com/taskworld/prescript/tree/master/examples/reporters).
