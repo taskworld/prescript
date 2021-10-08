@@ -30,7 +30,7 @@ export declare function action(f: ActionFunction): void;
 export declare type ActionFunction = (state: Prescript.GlobalState, context: ITestExecutionContext) => void | Thenable;
 
 /**
- * @public
+ * @alpha
  */
 export declare type ActionWrapper = (step: IStep, execute: () => Promise<void>, state: Prescript.GlobalState, context: ITestExecutionContext) => Promise<void>;
 
@@ -53,6 +53,7 @@ declare const _default: {
     getCurrentState: typeof getCurrentState;
     getCurrentContext: typeof getCurrentContext;
     getCurrentPrescriptionState: typeof getCurrentPrescriptionState;
+    isPendingError: typeof isPendingError;
 };
 export default _default;
 
@@ -102,8 +103,19 @@ export declare interface IConfig {
      * - Enhance the error message / stack trace.
      * - Benchmarking and profiling.
      * - etc.
+     *
+     * @alpha
      */
     wrapAction?: ActionWrapper;
+    /**
+     * Create a custom test reporter.
+     * @remarks
+     * It is very important that the reporter do not throw an error.
+     * Otherwise, the behavior of prescript is undefined.
+     * @param testModulePath - The path of the test file.
+     * @alpha
+     */
+    createTestReporter?(testModulePath: string, testName: string): ITestReporter;
 }
 
 /**
@@ -113,7 +125,16 @@ export declare interface IConfig {
 export declare function independent<X>(f: () => X): X;
 
 /**
- * @internal
+ * Checks if the provided Error object is a PendingError, which is
+ * thrown by the `pending()` step.
+ *
+ * @param e - The error to check.
+ * @public
+ */
+export declare function isPendingError(e: any): boolean;
+
+/**
+ * @alpha
  */
 export declare interface IStep {
     name: StepName;
@@ -151,6 +172,31 @@ export declare interface ITestExecutionContext {
 }
 
 /**
+ * @alpha
+ */
+export declare interface ITestReporter {
+    /**
+     * Called when the test is finished.
+     * @param errors - Errors that occurred during the test.
+     *  If there are no errors, this will be an empty array.
+     *  Note that pending tests are treated the same way as errors.
+     *  To check if an error object represents a pending test, use the {@link isPendingError} function.
+     */
+    onFinish(errors: Error[]): void;
+    /**
+     * Called when the test step is being entered.
+     * @param step - The test step that is being entered.
+     */
+    onEnterStep(step: IStep): void;
+    /**
+     * Called when the test step is being exited.
+     * @param step - The test step that is being exited.
+     * @param error - The error that occurred during the test step.
+     */
+    onExitStep(step: IStep, error?: Error): void;
+}
+
+/**
  * Deprecated.
  * @public
  * @deprecated Use `defer()` instead.
@@ -173,16 +219,19 @@ export { pending_2 as pending }
 export declare function step<X>(name: StepDefName, f: () => X): X;
 
 /**
- * @internal
+ * @public
  */
 export declare type StepDefName = StepName | string;
 
 /**
- * @internal
+ * @public
  */
 export declare class StepName {
     parts: string[];
     placeholders: string[];
+    /**
+     * @internal
+     */
     constructor(parts: string[], placeholders: string[]);
     toString(): string;
 }

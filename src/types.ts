@@ -12,7 +12,7 @@ declare global {
 }
 
 /**
- * @internal
+ * @public
  */
 export type StepDefName = StepName | string
 
@@ -30,12 +30,24 @@ export interface IConfig {
    * - Enhance the error message / stack trace.
    * - Benchmarking and profiling.
    * - etc.
+   *
+   * @alpha
    */
   wrapAction?: ActionWrapper
+
+  /**
+   * Create a custom test reporter.
+   * @remarks
+   * It is very important that the reporter do not throw an error.
+   * Otherwise, the behavior of prescript is undefined.
+   * @param testModulePath - The path of the test file.
+   * @alpha
+   */
+  createTestReporter?(testModulePath: string, testName: string): ITestReporter
 }
 
 /**
- * @public
+ * @alpha
  */
 export type ActionWrapper = (
   step: IStep,
@@ -45,7 +57,7 @@ export type ActionWrapper = (
 ) => Promise<void>
 
 /**
- * @internal
+ * @alpha
  */
 export interface IStep {
   name: StepName
@@ -136,10 +148,31 @@ export interface IIterationListener {
   onExit: (node: IStep, error?: Error) => void
 }
 
+/**
+ * @alpha
+ */
 export interface ITestReporter {
-  onFinish: (errors: Error[]) => void
-  onEnterStep: IIterationListener['onEnter']
-  onExitStep: IIterationListener['onExit']
+  /**
+   * Called when the test is finished.
+   * @param errors - Errors that occurred during the test.
+   *  If there are no errors, this will be an empty array.
+   *  Note that pending tests are treated the same way as errors.
+   *  To check if an error object represents a pending test, use the {@link isPendingError} function.
+   */
+  onFinish(errors: Error[]): void
+
+  /**
+   * Called when the test step is being entered.
+   * @param step - The test step that is being entered.
+   */
+  onEnterStep(step: IStep): void
+
+  /**
+   * Called when the test step is being exited.
+   * @param step - The test step that is being exited.
+   * @param error - The error that occurred during the test step.
+   */
+  onExitStep(step: IStep, error?: Error): void
 }
 
 export interface IVisitor {

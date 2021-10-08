@@ -6,6 +6,7 @@ export interface ResolvedConfig extends IConfig {
 
 export function resolveConfig(config: IConfig): ResolvedConfig {
   return {
-    wrapAction: config.wrapAction || ((step, execute) => execute())
+    wrapAction: config.wrapAction || ((step, execute) => execute()),
+    createTestReporter: config.createTestReporter
   }
 }

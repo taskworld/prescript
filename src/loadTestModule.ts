@@ -10,6 +10,7 @@ import {
   ITestLoadLogger,
   IPrescriptAPI
 } from './types'
+import { PendingError } from './PendingError'
 
 type StackTrace = ErrorStackParser.StackFrame[]
 
@@ -168,9 +169,7 @@ function loadTest(
     context.pending()
   }
   const DEFAULT_ACTION_STEP = async () => {
-    const error = new Error('[pending]')
-    ;(error as any).__prescriptPending = true
-    throw error
+    throw new PendingError()
   }
 
   const context: IPrescriptAPI = {
@@ -285,8 +284,7 @@ function loadTest(
       }
     },
     pending() {
-      const error = new Error('[pending]')
-      ;(error as any).__prescriptPending = true
+      const error = new PendingError()
       const definition = getSource(ErrorStackParser.parse(new Error(`Pending`)))
       return appendStep(
         { name: StepName.coerce('Pending'), definition, pending: true },

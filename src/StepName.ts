@@ -57,10 +57,14 @@ export function format(stepName: StepName | string, { colors = true } = {}) {
 }
 
 /**
- * @internal
+ * @public
  */
 export class StepName {
+  /**
+   * @internal
+   */
   constructor(public parts: string[], public placeholders: string[]) {}
+
   toString() {
     return format(this, { colors: false })
   }

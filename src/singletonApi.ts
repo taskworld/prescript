@@ -3,19 +3,23 @@
  * @packageDocumentation
  */
 
-import { ActionFunction, StepDefName } from './types'
 import currentActionContext from './currentActionContext'
-export {
-  IConfig,
-  ActionFunction,
-  StepDefName,
-  ITestExecutionContext,
-  ActionWrapper,
-  Thenable,
-  IStep
-} from './types'
-export { StepName } from './StepName'
+import { isPendingError } from './PendingError'
 import { getInstance } from './singleton'
+import { ActionFunction, StepDefName } from './types'
+
+export { isPendingError } from './PendingError'
+export { StepName } from './StepName'
+export {
+  ActionFunction,
+  ActionWrapper,
+  IConfig,
+  IStep,
+  ITestExecutionContext,
+  ITestReporter,
+  StepDefName,
+  Thenable
+} from './types'
 
 /**
  * Creates a Test.
@@ -212,5 +216,6 @@ export default {
   onFinish,
   getCurrentState,
   getCurrentContext,
-  getCurrentPrescriptionState
+  getCurrentPrescriptionState,
+  isPendingError
 }
