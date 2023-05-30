@@ -255,7 +255,7 @@ function runNonInteractiveMode(
   requestedTestName: string | null,
   config: ResolvedConfig
 ) {
-  console.log(chalk.bold.yellow('## Generating test plan...'))
+  // console.log(chalk.bold.yellow('## Generating test plan...'))
   const tests = singleton
     .loadTests(
       () => {
@@ -268,19 +268,19 @@ function runNonInteractiveMode(
     throw new Error('No tests found.')
   }
   if (tests.length > 1) {
-    console.log()
-    console.log(chalk.bold.red('Multiple tests found.'))
-    console.log('  You must specify a test to run.')
-    console.log('  Use `--list` to see a list of tests.')
+    // console.log()
+    // console.log(chalk.bold.red('Multiple tests found.'))
+    // console.log('  You must specify a test to run.')
+    // console.log('  Use `--list` to see a list of tests.')
     process.exitCode = 3
     return
   }
-  console.log(
-    chalk.dim('* ') + chalk.green('Test plan generated successfully.')
-  )
-  console.log()
+  // console.log(
+  //   chalk.dim('* ') + chalk.green('Test plan generated successfully.')
+  // )
+  // console.log()
 
-  console.log(chalk.bold.yellow('## Running tests...'))
+  // console.log(chalk.bold.yellow('## Running tests...'))
   runTest().catch(e =>
     setTimeout(() => {
       throw e
@@ -295,7 +295,7 @@ function runNonInteractiveMode(
     )
     const iterationListener: IIterationListener = {
       onEnter: node => reporter.onEnterStep(node),
-      onExit: (node, error) => reporter.onExitStep(node, error)
+      onExit: (node, error) => reporter.onExitStep(node, error),
     }
     const tester = createTestIterator(createLogVisitor(), iterationListener)
     const errors: Error[] = []
