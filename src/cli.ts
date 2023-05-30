@@ -27,6 +27,8 @@ import singletonAllureInstance from './singletonAllureInstance'
 import currentActionContext from './currentActionContext'
 import { isPendingError } from './PendingError'
 
+const runInCI = Boolean(process.env.CI)
+
 function main(args) {
   const testModulePath = require('fs').realpathSync(args._[0])
   const result = cosmiconfig('prescript').searchSync(
@@ -255,7 +257,10 @@ function runNonInteractiveMode(
   requestedTestName: string | null,
   config: ResolvedConfig
 ) {
-  // console.log(chalk.bold.yellow('## Generating test plan...'))
+  if (!runInCI) {
+    console.log(chalk.bold.yellow('## Generating test plan...'))
+  }
+
   const tests = singleton
     .loadTests(
       () => {
@@ -268,19 +273,21 @@ function runNonInteractiveMode(
     throw new Error('No tests found.')
   }
   if (tests.length > 1) {
-    // console.log()
-    // console.log(chalk.bold.red('Multiple tests found.'))
-    // console.log('  You must specify a test to run.')
-    // console.log('  Use `--list` to see a list of tests.')
+    console.log()
+    console.log(chalk.bold.red('Multiple tests found.'))
+    console.log('  You must specify a test to run.')
+    console.log('  Use `--list` to see a list of tests.')
     process.exitCode = 3
     return
   }
-  // console.log(
-  //   chalk.dim('* ') + chalk.green('Test plan generated successfully.')
-  // )
-  // console.log()
+  if (!runInCI) {
+    console.log(
+      chalk.dim('* ') + chalk.green('Test plan generated successfully.')
+    )
+    console.log()
 
-  // console.log(chalk.bold.yellow('## Running tests...'))
+    console.log(chalk.bold.yellow('## Running tests...'))
+  }
   runTest().catch(e =>
     setTimeout(() => {
       throw e
