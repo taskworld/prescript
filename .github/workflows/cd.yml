@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - master
+      - docs-revamp
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn docs:build
+
+      - uses: peaceiris/actions-gh-pages@8457ade3d7045b4842e5a10f733d4153b7d05238
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/.vuepress/dist

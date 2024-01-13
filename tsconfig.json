@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "es2017",
-    "module": "commonjs",
-    "strict": true,
-    "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
-    "outDir": "lib",
-    "skipLibCheck": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "rootDir": "src"
+    "outDir": "lib",
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "useUnknownInCatchVariables": false
   },
   "include": ["src/**/*"]
 }

@@ -2,16 +2,26 @@
   "name": "prescript",
   "version": "0.55555555.0",
   "description": "Object-oriented acceptance test tool",
-  "main": "./lib/singletonApi.js",
-  "types": "./api/prescript.d.ts",
   "author": "Thai Pangsakulyanont <thai.p@taskworld.com>",
   "license": "MIT",
+  "main": "./lib/singletonApi.js",
+  "types": "./api/prescript.d.ts",
+  "bin": "./bin/prescript",
   "files": [
     "lib",
     "bin",
     "api/prescript.d.ts",
     "cli.js"
   ],
+  "scripts": {
+    "lint": "eslint . --ext .ts,.js",
+    "build": "tsc",
+    "prepare": "rm -rf lib && yarn build",
+    "test": "jest",
+    "test-examples": "node examples/testAll.js",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
   "dependencies": {
     "@types/cosmiconfig": "^5.0.3",
     "allure-js-commons": "^2.0.0-beta.7",
@@ -32,7 +42,7 @@
     "@types/invariant": "^2.2.29",
     "@types/jest": "^22.2.3",
     "@types/ms": "^0.7.30",
-    "@types/node": "^10.0.0",
+    "@types/node": "^16.0.0",
     "@typescript-eslint/parser": "^2.2.0",
     "allure-commandline": "^2.13.0",
     "eslint": "^6.3.0",
@@ -42,19 +52,10 @@
     "jest": "^22.4.3",
     "prettier": "^1.18.2",
     "ts-jest": "^22.4.4",
-    "typescript": "~3.5.1",
+    "typescript": "^5.3.3",
     "vuepress": "^1.4.1"
   },
-  "scripts": {
-    "lint": "eslint . --ext .ts,.js",
-    "build": "tsc",
-    "prepare": "rm -rf lib && yarn build",
-    "test": "jest",
-    "test-examples": "node examples/testAll.js",
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
-  },
-  "bin": {
-    "prescript": "./bin/prescript"
+  "volta": {
+    "node": "16.20.2"
   }
 }

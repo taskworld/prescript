@@ -1,0 +1,45 @@
+on:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - run: yarn lint
+
+      - run: yarn test
+
+      - run: yarn build
+
+  build:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Update API reports
+        run: mkdir -p api && yarn api-extractor run --local
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update API report as of ${{ github.sha }}
+          file_pattern: api
+          commit_user_name: rebasecop
+          commit_user_email: rebasecop@users.noreply.github.com
+          commit_author: rebasecop <rebasecop@users.noreply.github.com>
