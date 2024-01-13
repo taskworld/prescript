@@ -3,17 +3,17 @@ import { createHash } from 'crypto'
 import singletonAllureInstance from './singletonAllureInstance'
 import {
   AllureRuntime,
-  IAllureConfig,
+  AllureConfig,
   ExecutableItemWrapper,
   AllureTest,
   AllureStep,
   Stage,
   Status,
   LabelName,
-  AllureGroup
+  AllureGroup,
+  FileSystemAllureWriter
 } from 'allure-js-commons'
 import { hostname } from 'os'
-import { AllureWriter } from 'allure-js-commons/dist/src/writers'
 import { StepName } from './StepName'
 import { IStep, ITestReporter, IConfig } from './types'
 import { isPendingError } from './PendingError'
@@ -48,8 +48,8 @@ class AllureTestReporter implements ITestReporter {
       .update([suiteName, caseName].join(' / '))
       .digest('hex')
 
-    const allureConfig: IAllureConfig = { resultsDir }
-    const writer = new AllureWriter(allureConfig)
+    const allureConfig: AllureConfig = { resultsDir }
+    const writer = new FileSystemAllureWriter(allureConfig)
     const runtime = new AllureRuntime({ ...allureConfig, writer })
     const group = runtime.startGroup(suiteName)
     const test = group.startTest(caseName)
